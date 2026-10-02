@@ -27,6 +27,16 @@ header.top .w{display:flex;justify-content:space-between;align-items:center;min-
 .brand{font:600 15px/1 var(--mono);color:var(--text);text-decoration:none;letter-spacing:.02em}
 .nav{display:flex;gap:4px;flex-wrap:wrap}
 .nav a{display:inline-flex;align-items:center;min-height:44px;padding:0 10px;font:500 12px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mute);text-decoration:none}
+.hero{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:48px;align-items:center}
+.hx{margin:0;position:relative;aspect-ratio:1;max-width:420px;width:100%;justify-self:end;border:1px solid var(--line);border-radius:6px;background:var(--card);background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:28px 28px;background-position:-1px -1px}
+.hx::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,transparent 20%,var(--card) 78%);border-radius:6px}
+.hx svg{position:absolute;inset:0;width:100%;height:100%}
+.hx svg line{stroke:var(--mint);stroke-opacity:.45;stroke-width:1;stroke-dasharray:3 4}
+.hx .m,.hx .t{position:absolute;transform:translate(-50%,-50%);font:600 11px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;white-space:nowrap}
+.hx .m{left:50%;top:50%;padding:30px 26px;border:1px solid var(--mint);color:var(--mint2);background:var(--bg);border-radius:4px}
+.hx .t{padding:8px 10px;border:1px solid var(--line);background:var(--bg);color:var(--text);border-radius:3px}
+.hx .t::before{content:"";display:inline-block;width:6px;height:6px;margin-right:7px;border-radius:50%;background:var(--mint);vertical-align:1px}
+@media (max-width:860px){.hero{grid-template-columns:1fr;gap:32px}.hx{justify-self:start;max-width:320px}}
 section{padding:72px 0;border-bottom:1px solid var(--line)}
 section.low{background:var(--low)}
 .k{margin:0 0 14px;font:600 11px/1.4 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--mint2)}
@@ -84,12 +94,19 @@ footer p{max-width:none}
 <main>
 <section>
   <div class="w">
+    <div class="hero"><div>
     <p class="k">An open benchmark harness for orthopaedic AI</p>
     <h1>The models are good enough. <em>The test is not.</em></h1>
     <p class="lead">A harness is everything around the model: what goes in, which tools it can use, what checks the output, how it is scored, and what gets recorded. orthoharness scores orthopaedic AI, and surgeons, the way surgeons actually decide. Apache-2.0, no dependencies, runs offline.</p>
     <div class="btns">
       <a class="btn p" href="https://github.com/blainomd/orthoharness">Get the code</a>
       <a class="btn" href="https://surgeonvalue.com/docsf#harness">Why, with sources</a>
+    </div>
+    </div>
+    <figure class="hx" role="img" aria-label="The harness around the model: inputs, tools, checks, scoring, record">
+      <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><line x1="50" y1="50" x2="50" y2="14"/><line x1="50" y1="50" x2="84" y2="38"/><line x1="50" y1="50" x2="84" y2="72"/><line x1="50" y1="50" x2="50" y2="88"/><line x1="50" y1="50" x2="16" y2="55"/></svg>
+      <span class="m">model</span><span class="t" style="left:50%;top:14%">inputs</span><span class="t" style="left:84%;top:38%">tools</span><span class="t" style="left:84%;top:72%">checks</span><span class="t" style="left:50%;top:88%">scoring</span><span class="t" style="left:16%;top:55%">record</span>
+    </figure>
     </div>
     <p class="status"><b>Status:</b> a reference implementation, not a validated benchmark. Its six demo cases are synthetic, written to exercise the harness, and are not clinical guidance. Its loss weights are placeholders that show the shape. The real cases and weights belong to the specialty.</p>
   </div>
