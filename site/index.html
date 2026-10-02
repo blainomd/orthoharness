@@ -67,12 +67,17 @@ footer p{max-width:none}
  .grid{grid-template-columns:1fr}
  .nav a{padding:0 8px;font-size:11px}
 }
+.sup{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:24px}
+.sup a{display:block;background:var(--card);padding:20px 22px;text-decoration:none;min-height:44px}
+.sup b{display:block;font:600 14px/1.3 var(--mono);color:var(--text);margin-bottom:6px}
+.sup span{display:block;font-size:14px;line-height:1.5;color:var(--mute)}
+@media (max-width:860px){.sup{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 <header class="top"><div class="w">
   <a class="brand" href="/">orthoharness</a>
-  <nav class="nav" aria-label="Sections"><a href="#rows">The nine rows</a><a href="#run">Run it</a><a href="#own">Who owns it</a><a href="https://github.com/blainomd/orthoharness">GitHub</a></nav>
+  <nav class="nav" aria-label="Sections"><a href="#rows">The nine rows</a><a href="#run">Run it</a><a href="#support">Supported by</a><a href="#own">Who owns it</a><a href="https://github.com/blainomd/orthoharness">GitHub</a></nav>
 </div></header>
 
 <main>
@@ -124,6 +129,22 @@ node bin/orthoharness.mjs run cases/demo --adapter replay --answers examples/ans
       <div class="c"><h3>Score a person</h3><p>The replay adapter reads a surgeon&apos;s own recorded answers and grades them by the same rules. <code>compare</code> puts aided and unaided side by side.</p></div>
       <div class="c"><h3>Keep the delta</h3><p><code>delta draft.txt signed.txt</code> labels every kept, struck and added line. A note signed exactly as drafted is flagged: no evidence anyone edited it.</p></div>
       <div class="c"><h3>Keep the exam private</h3><p><code>hash</code> gives a sha256 commitment to a case set. Publish the hash and the loss matrix; withhold the questions.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="support">
+  <div class="w">
+    <p class="k">Open source, with support from</p>
+    <h2>Sites that point here, and hold themselves to it.</h2>
+    <p>Each of these links to the harness and states the rule it applies to its own work. None of them owns it.</p>
+    <div class="sup">
+      <a href="https://surgeonvalue.com/docsf#harness"><b>SurgeonValue</b><span>The why, every source, and six questions for any AI vendor. Including itself.</span></a>
+      <a href="https://clinicalswipe.com"><b>ClinicalSwipe</b><span>A signature proves who signed, not that anyone looked. Every decision carries a written reason.</span></a>
+      <a href="https://jointcoach.com"><b>JointCoach</b><span>Says what it measures and how sure it is: angles are estimates, with no measured error yet.</span></a>
+      <a href="https://jointclass.com"><b>JointClass</b><span>For patients: if your surgeon&apos;s office uses AI, ask who checks it, and who signs.</span></a>
+      <a href="https://www.mskvalue.com"><b>MSKValue</b><span>Measure, don&apos;t promise. Two yardsticks, never averaged. Outcomes never rank a surgeon.</span></a>
+      <a href="https://solvinghealth.com/build"><b>SolvingHealth</b><span>Lists the harness and citecheck with the estate&apos;s other open code.</span></a>
     </div>
   </div>
 </section>
