@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://orthoharness.com/sitemap.xml

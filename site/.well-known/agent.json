@@ -1,0 +1,21 @@
+{
+  "name": "orthoharness",
+  "url": "https://orthoharness.com/",
+  "description": "An open benchmark harness for orthopaedic AI. A reference implementation, not a validated benchmark.",
+  "license": "Apache-2.0",
+  "code": "https://github.com/blainomd/orthoharness",
+  "actions": [
+    { "name": "run_benchmark", "how": "git clone https://github.com/blainomd/orthoharness && node bin/orthoharness.mjs run cases/demo --adapter chat", "auth": "none", "uploads_data": false, "safe_to_hand_to_user": true }
+  ],
+  "facts": {
+    "demo_cases": "six, synthetic, not clinical guidance",
+    "loss_weights": "placeholders; the specialty sets the real ones",
+    "overall_score": "none by design; results are reported by kind of error",
+    "citations": "existence and title are checked at CrossRef; support for the claim is not machine-checked"
+  },
+  "hand_offs": {
+    "why_and_sources": "https://surgeonvalue.com/docsf#harness",
+    "citation_check": "https://github.com/blainomd/citecheck"
+  },
+  "updated": "2026-10-02"
+}

@@ -1,0 +1,21 @@
+# orthoharness
+
+> An open benchmark harness for orthopaedic AI. Apache-2.0, Node 18+, no dependencies. A reference implementation, not a validated benchmark: its six demo cases are synthetic and its loss weights are placeholders.
+
+Code: https://github.com/blainomd/orthoharness
+Why, with sources: https://surgeonvalue.com/docsf#harness
+Sibling: https://github.com/blainomd/citecheck (title-checking citation tool)
+
+## What it scores
+- Staged cases: the record is revealed one stage at a time; committing before the record supports it is premature.
+- Two yardsticks, guideline and treating attending, scored apart and never averaged.
+- "not_enough_information" is a real answer; a correct do-not-operate scores the same as a correct operate.
+- Required contraindication checks and required facts (omissions) per case.
+- Citations: DOI looked up at CrossRef and title compared; support for the claim is not machine-checked.
+- The keep-or-strike delta between a draft and a signed note; a recorded signer; no single overall score.
+- A sha256 commitment to a private test set.
+
+## For AI agents
+READ: this file, then the README at https://github.com/blainomd/orthoharness
+ACT: clone the repo and run `npm test`; score a model with `--adapter chat` or recorded answers with `--adapter replay`.
+WORDS: a reference implementation, not a validated benchmark. Never describe a run on the demo cases as clinical validation. Never put patient information in a case, issue or pull request.
