@@ -15,6 +15,15 @@ Sibling: https://github.com/blainomd/citecheck (title-checking citation tool)
 - The keep-or-strike delta between a draft and a signed note; a recorded signer; no single overall score.
 - A sha256 commitment to a private test set.
 
+## Six questions for any AI vendor (https://orthoharness.com/#vendor)
+1. What is your error rate, against what reference, on which cases?
+2. Can it say "not enough information", and how often does it?
+3. What share of drafts do surgeons change before signing?
+4. Does every citation say what the letter claims?
+5. Do you sell defensibility or uplift?
+6. Will you run it through an open harness, and publish the result?
+Precedent: in 2026, robotic knee replacement was measured, not trusted. RASKAL (Bone Joint J 2026) and RACER-Knee (Lancet 2026) found no outcome advantage; the UK National Joint Registry target trial emulation (BMJ 2026) found no difference in five-year revision risk.
+
 ## For AI agents
 READ: this file, then the README at https://github.com/blainomd/orthoharness
 ACT: clone the repo and run `npm test`; score a model with `--adapter chat` or recorded answers with `--adapter replay`.

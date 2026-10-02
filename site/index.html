@@ -45,6 +45,8 @@ h1 em,h2 em{color:var(--amber)}
 h2{margin:0 0 18px;font:400 clamp(28px,4vw,42px)/1.15 var(--serif);letter-spacing:-.01em}
 p.lead{max-width:760px;font-size:19px;color:var(--mute);margin:0 0 28px}
 p{max-width:760px;color:var(--mute)}
+.qn{color:var(--mint2);font-family:var(--mono);margin-right:4px}
+.grid+p{margin-top:28px}
 .btns{display:flex;flex-wrap:wrap;gap:12px;margin-top:8px}
 .btn{display:inline-flex;align-items:center;min-height:48px;padding:0 20px;border:1px solid var(--line);border-radius:3px;font:600 13px/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;text-decoration:none;color:var(--text);background:var(--card)}
 .btn.p{background:var(--mint);border-color:var(--mint);color:#04130d}
@@ -88,7 +90,7 @@ footer p{max-width:none}
 <body>
 <header class="top"><div class="w">
   <a class="brand" href="/">orthoharness</a>
-  <nav class="nav" aria-label="Sections"><a href="#rows">The nine rows</a><a href="#run">Run it</a><a href="#support">Supported by</a><a href="#own">Who owns it</a><a href="https://github.com/blainomd/orthoharness">GitHub</a></nav>
+  <nav class="nav" aria-label="Sections"><a href="#rows">The nine rows</a><a href="#run">Run it</a><a href="#vendor">Ask a vendor</a><a href="#support">Supported by</a><a href="#own">Who owns it</a><a href="https://github.com/blainomd/orthoharness">GitHub</a></nav>
 </div></header>
 
 <main>
@@ -112,6 +114,15 @@ footer p{max-width:none}
   </div>
 </section>
 
+<section id="why">
+  <div class="w">
+    <p class="k">Why a harness</p>
+    <h2>Orthopaedics does not need its own model. <em>It needs its own harness.</em></h2>
+    <p>General-purpose models now beat specialized clinical tools on benchmarks (Vishwanath, Nature Medicine 2026). What decides whether one is safe in an orthopaedic clinic is everything around it, and a scorecard built for how surgeons actually decide.</p>
+    <p><b>Start with what goes in.</b> Asked for evidence with nothing to read from, a model fabricated 7.9% of 2,556 citations (McCavitt, JBJS OA 2026). Handed the source papers, models hallucinated in 0.08&ndash;6% of extractions, and leaving things out became the main error, 60&ndash;74% of the total (Shankar, J Biomed Inform 2026). Different tasks and models, so read it as direction, not rate: grounding the input removes most of the invention and moves the error to what is missing. A harness has to measure both.</p>
+  </div>
+</section>
+
 <section id="rows" class="low">
   <div class="w">
     <p class="k">The nine rows</p>
@@ -128,6 +139,7 @@ footer p{max-width:none}
       <li class="r"><span class="n">8</span><p class="today">Written once, then stale.</p><div><p class="fix">The keep-or-strike delta turns a draft and a signed note into labeled kept, struck and added lines.</p><p class="src">The evidence a person looked, and new data from real practice.</p></div></li>
       <li class="r"><span class="n">9</span><p class="today">Nobody owns the answer.</p><div><p class="fix">Every run records who signed. Without a signer, answers are reported as unsigned drafts. There is no single overall score.</p><p class="src">California AB 1979, signed Sep 30, 2026.</p></div></li>
     </ol>
+    <p>Publish the loss matrix and weight each error by the harm it does: a missed infection is not an extra X-ray. Report results by kind of error, not as one leaderboard number. Withhold the test questions so no model trains on the exam.</p>
   </div>
 </section>
 
@@ -148,6 +160,29 @@ node bin/orthoharness.mjs run cases/demo --adapter replay --answers examples/ans
       <div class="c"><h3>Keep the delta</h3><p><code>delta draft.txt signed.txt</code> labels every kept, struck and added line. A note signed exactly as drafted is flagged: no evidence anyone edited it.</p></div>
       <div class="c"><h3>Keep the exam private</h3><p><code>hash</code> gives a sha256 commitment to a case set. Publish the hash and the loss matrix; withhold the questions.</p></div>
     </div>
+  </div>
+</section>
+
+<section id="vendor" class="low">
+  <div class="w">
+    <p class="k">Before you buy</p>
+    <h2>Six questions for any AI vendor. <em>Including us.</em></h2>
+    <p>Scribes, coders, prior-auth and appeal agents are all selling to orthopaedic practices. Most publish an outcome they promise, not an error rate they measured. The harness, turned into questions:</p>
+    <div class="grid">
+      <div class="c"><h3><span class="qn">1</span> What is your error rate, against what reference, on which cases?</h3><p>A number measured against a named reference on a stated case mix. Knowledge scores run far above practice scores across 39 benchmarks (Gong, JMIR 2025), so ask for practice.</p></div>
+      <div class="c"><h3><span class="qn">2</span> Can it say “not enough information”, and how often does it?</h3><p>A system that never abstains is guessing on the incomplete records. All 16 systems scored with abstention over-committed (CliniCARE-Bench, preprint).</p></div>
+      <div class="c"><h3><span class="qn">3</span> What share of drafts do surgeons change before signing?</h3><p>“Signed without edits” is not a feature. It means there is no evidence anyone looked. Drafted histories carried erroneous information 36% of the time in a JAAOS trial.</p></div>
+      <div class="c"><h3><span class="qn">4</span> Does every citation in your letters say what the letter claims?</h3><p>Existing is not supporting: 7.9% fabricated and about nine in ten real citations misattributed (McCavitt, JBJS OA 2026). Ask who reads them before they go to a payer.</p></div>
+      <div class="c"><h3><span class="qn">5</span> Do you sell defensibility or uplift?</h3><p>A promised rise in code levels is what an audit looks for. Ask what happens to a claim when the documentation does not support it: does the tool say no?</p></div>
+      <div class="c"><h3><span class="qn">6</span> Will you run it through an open harness, and publish the result?</h3><p>Two yardsticks, staged cases, credit for abstaining, the delta, a named signer. This harness is open source; any vendor can run it.</p></div>
+    </div>
+    <p>Orthopaedics already ran this test on its last big technology. In 2026, three studies measured robotic knee replacement instead of trusting the brochure:</p>
+    <div class="grid">
+      <div class="c"><h3><span class="qn">A</span> RASKAL, a randomized trial</h3><p>Robotic-assisted surgery was not superior to computer-assisted surgery, and functional alignment was not superior to mechanical alignment, on KOOS-12 up to two years. MacDessi · Bone Joint J 2026.</p></div>
+      <div class="c"><h3><span class="qn">B</span> RACER-Knee, a randomized trial</h3><p>Robotic-arm-assisted knee replacement gave the same patient outcomes as conventional surgery, with longer operations at higher cost. Parsons · Lancet 2026.</p></div>
+      <div class="c"><h3><span class="qn">C</span> The UK registry, a target trial emulation</h3><p>Five-year implant survival after total knee replacement was 98.5% conventional and 98.6% robotic, with no difference in revision risk (HR 1.03). National Joint Registry data · BMJ 2026.</p></div>
+    </div>
+    <p>Nobody had to take a vendor&apos;s word for the robot. The same three questions apply to AI: a randomized comparison, a real-world registry, and a cost on the record.</p>
   </div>
 </section>
 
