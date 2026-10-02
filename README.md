@@ -4,6 +4,8 @@
 This is the test: everything around the model, so a system is scored on how surgeons actually
 decide, not on board-style questions asked once.
 
+Site: https://orthoharness.com
+
 Apache-2.0 · Node 18+ · no dependencies · runs offline with `--offline` · nothing leaves your machine except DOIs to CrossRef and, only if you choose the `chat` adapter, the case text to the endpoint you name
 
 > **Status: a reference implementation, not a validated benchmark.** The six cases in `cases/demo/`
