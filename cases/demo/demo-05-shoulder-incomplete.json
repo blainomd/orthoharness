@@ -1,0 +1,43 @@
+{
+  "id": "demo-05-shoulder-incomplete",
+  "split": "dev",
+  "synthetic": true,
+  "note": "Synthetic case written to exercise the harness. Not a real patient, not clinical guidance; the reference answers are illustrative and have not been reviewed by a panel.",
+  "stages": [
+    {
+      "label": "History",
+      "text": "55-year-old with shoulder pain for an unknown period, referred by a note that reads only 'shoulder pain, ? surgery'."
+    },
+    {
+      "label": "Imaging report",
+      "text": "Report not available."
+    },
+    {
+      "label": "Exam",
+      "text": "Not documented."
+    }
+  ],
+  "yardsticks": {
+    "guideline": {
+      "decision": "not_enough_information",
+      "note": "No exam, no imaging, no duration: nothing to decide on."
+    },
+    "attending": {
+      "decision": "not_enough_information",
+      "note": "See the patient and get imaging first."
+    }
+  },
+  "required_facts": [
+    {
+      "id": "missing_exam_or_imaging",
+      "any": [
+        "no exam",
+        "not documented",
+        "not available",
+        "no imaging",
+        "missing"
+      ]
+    }
+  ],
+  "required_checks": []
+}

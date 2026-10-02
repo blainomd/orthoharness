@@ -1,0 +1,50 @@
+{
+  "id": "demo-06-acute-traumatic-cuff",
+  "split": "dev",
+  "synthetic": true,
+  "note": "Synthetic case written to exercise the harness. Not a real patient, not clinical guidance; the reference answers are illustrative and have not been reviewed by a panel.",
+  "min_stage": 2,
+  "stages": [
+    {
+      "label": "History",
+      "text": "50-year-old manual worker, no prior shoulder symptoms, fell onto an outstretched arm two weeks ago and cannot lift the arm."
+    },
+    {
+      "label": "Imaging report",
+      "text": "MRI: acute full-thickness supraspinatus and infraspinatus tear with minimal retraction and no fatty atrophy."
+    },
+    {
+      "label": "Exam",
+      "text": "Marked weakness in elevation and external rotation; passive motion full."
+    }
+  ],
+  "yardsticks": {
+    "guideline": {
+      "decision": "operate",
+      "note": "Early repair is commonly recommended for an acute traumatic full-thickness tear in an active patient."
+    },
+    "attending": {
+      "decision": "operate",
+      "note": "Repair soon, before retraction and atrophy."
+    }
+  },
+  "required_facts": [
+    {
+      "id": "acute_traumatic",
+      "any": [
+        "acute",
+        "traumatic",
+        "fall",
+        "fell"
+      ]
+    },
+    {
+      "id": "no_atrophy",
+      "any": [
+        "atrophy",
+        "retraction"
+      ]
+    }
+  ],
+  "required_checks": []
+}

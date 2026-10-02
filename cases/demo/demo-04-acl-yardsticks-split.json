@@ -1,0 +1,43 @@
+{
+  "id": "demo-04-acl-yardsticks-split",
+  "split": "dev",
+  "synthetic": true,
+  "note": "Synthetic case written to exercise the harness. Not a real patient, not clinical guidance; the reference answers are illustrative and have not been reviewed by a panel.",
+  "min_stage": 2,
+  "stages": [
+    {
+      "label": "History",
+      "text": "19-year-old soccer player, non-contact pivoting injury three weeks ago, immediate swelling. Wants to return to competitive soccer."
+    },
+    {
+      "label": "Imaging report",
+      "text": "Complete ACL tear. No meniscal tear that needs repair. Bone bruising typical of the mechanism."
+    },
+    {
+      "label": "Exam",
+      "text": "Positive Lachman and pivot shift. Full range of motion, quadriceps activation good."
+    }
+  ],
+  "yardsticks": {
+    "guideline": {
+      "decision": "do_not_operate",
+      "note": "Illustrative: structured rehabilitation first, with reconstruction if instability persists, is a supported option."
+    },
+    "attending": {
+      "decision": "operate",
+      "note": "Illustrative: early reconstruction for a pivoting athlete who wants to return."
+    }
+  },
+  "required_facts": [
+    {
+      "id": "pivoting_sport_goal",
+      "any": [
+        "soccer",
+        "pivoting",
+        "return to sport",
+        "return to competitive"
+      ]
+    }
+  ],
+  "required_checks": []
+}

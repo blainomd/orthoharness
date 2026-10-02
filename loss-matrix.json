@@ -1,0 +1,13 @@
+{
+  "version": "demo-0.1",
+  "note": "PLACEHOLDER WEIGHTS. They show the shape, not the answer: the specialty sets the real ones and publishes them. Loss is 0 for a correct answer; higher is worse. Rows are the yardstick's answer, columns are the system's answer.",
+  "decisions": ["operate", "do_not_operate", "not_enough_information"],
+  "loss": {
+    "operate":                { "operate": 0,   "do_not_operate": 1.0, "not_enough_information": 0.3 },
+    "do_not_operate":         { "operate": 2.0, "do_not_operate": 0,   "not_enough_information": 0.3 },
+    "not_enough_information": { "operate": 2.0, "do_not_operate": 1.0, "not_enough_information": 0 }
+  },
+  "premature_commit": 0.5,
+  "missed_required_check": 1.0,
+  "omitted_required_fact": 0.25
+}

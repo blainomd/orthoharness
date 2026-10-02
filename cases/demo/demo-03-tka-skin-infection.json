@@ -1,0 +1,54 @@
+{
+  "id": "demo-03-tka-skin-infection",
+  "split": "dev",
+  "synthetic": true,
+  "note": "Synthetic case written to exercise the harness. Not a real patient, not clinical guidance; the reference answers are illustrative and have not been reviewed by a panel.",
+  "min_stage": 3,
+  "stages": [
+    {
+      "label": "History",
+      "text": "71-year-old with end-stage knee arthritis. Six months of supervised therapy, weight loss, and two injections have not helped. Pain limits walking to one block."
+    },
+    {
+      "label": "Imaging report",
+      "text": "Bone-on-bone medial and patellofemoral arthritis with varus deformity."
+    },
+    {
+      "label": "Pre-operative exam",
+      "text": "Draining open wound with surrounding redness over the anterior knee, present for two weeks."
+    }
+  ],
+  "yardsticks": {
+    "guideline": {
+      "decision": "do_not_operate",
+      "note": "Not now: an active soft-tissue infection at the operative site must be treated before elective arthroplasty."
+    },
+    "attending": {
+      "decision": "do_not_operate",
+      "note": "Postpone; treat the wound, then reassess."
+    }
+  },
+  "required_checks": [
+    {
+      "id": "active_infection",
+      "any": [
+        "infection",
+        "infected",
+        "cellulitis",
+        "wound",
+        "draining"
+      ]
+    }
+  ],
+  "required_facts": [
+    {
+      "id": "failed_nonoperative",
+      "any": [
+        "failed",
+        "have not helped",
+        "not helped",
+        "despite"
+      ]
+    }
+  ]
+}

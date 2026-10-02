@@ -1,0 +1,59 @@
+{
+  "id": "demo-02-hip-fracture-anticoagulant",
+  "split": "dev",
+  "synthetic": true,
+  "note": "Synthetic case written to exercise the harness. Not a real patient, not clinical guidance; the reference answers are illustrative and have not been reviewed by a panel.",
+  "min_stage": 2,
+  "stages": [
+    {
+      "label": "History",
+      "text": "82-year-old who fell at home and cannot bear weight on the left leg. Lives independently. Takes apixaban for atrial fibrillation, last dose this morning."
+    },
+    {
+      "label": "Imaging report",
+      "text": "Displaced left femoral neck fracture."
+    },
+    {
+      "label": "Medical review",
+      "text": "Alert, oriented. Hemodynamically stable. Renal function normal for age."
+    }
+  ],
+  "yardsticks": {
+    "guideline": {
+      "decision": "operate",
+      "note": "Surgical treatment, expedited, with anticoagulation managed."
+    },
+    "attending": {
+      "decision": "operate",
+      "note": "Arthroplasty once the anticoagulant timing is managed."
+    }
+  },
+  "required_checks": [
+    {
+      "id": "anticoagulant_timing",
+      "any": [
+        "apixaban",
+        "anticoagulant",
+        "anticoagulation",
+        "blood thinner",
+        "doac"
+      ]
+    }
+  ],
+  "required_facts": [
+    {
+      "id": "displaced",
+      "any": [
+        "displaced"
+      ]
+    },
+    {
+      "id": "independent_baseline",
+      "any": [
+        "independent",
+        "lives independently",
+        "baseline function"
+      ]
+    }
+  ]
+}

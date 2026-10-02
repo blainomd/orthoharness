@@ -1,0 +1,55 @@
+{
+  "id": "demo-01-knee-oa-no-trial",
+  "split": "dev",
+  "synthetic": true,
+  "note": "Synthetic case written to exercise the harness. Not a real patient, not clinical guidance; the reference answers are illustrative and have not been reviewed by a panel.",
+  "min_stage": 2,
+  "stages": [
+    {
+      "label": "History",
+      "text": "64-year-old with four months of medial knee pain, worse on stairs. Walks two miles most days. Has taken occasional over-the-counter analgesics. Has not had physical therapy, a structured exercise program, or an injection. Asks about knee replacement."
+    },
+    {
+      "label": "Imaging report",
+      "text": "Standing radiographs: mild to moderate medial joint space narrowing with small osteophytes. No fracture, no lesion."
+    },
+    {
+      "label": "Exam",
+      "text": "Medial joint line tenderness, small effusion, full extension, flexion to 125 degrees, stable ligaments, normal gait."
+    }
+  ],
+  "yardsticks": {
+    "guideline": {
+      "decision": "do_not_operate",
+      "note": "Non-operative care first: exercise therapy, weight management, analgesia, with reassessment."
+    },
+    "attending": {
+      "decision": "do_not_operate",
+      "note": "Start supervised therapy; revisit if function declines despite it."
+    }
+  },
+  "required_facts": [
+    {
+      "id": "no_nonoperative_trial",
+      "any": [
+        "no physical therapy",
+        "not had physical therapy",
+        "no trial",
+        "nonoperative",
+        "non operative",
+        "conservative",
+        "exercise therapy",
+        "physical therapy first"
+      ]
+    },
+    {
+      "id": "radiographic_severity",
+      "any": [
+        "mild",
+        "moderate",
+        "joint space"
+      ]
+    }
+  ],
+  "required_checks": []
+}

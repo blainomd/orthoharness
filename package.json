@@ -1,0 +1,12 @@
+{
+  "name": "orthoharness",
+  "version": "0.1.0",
+  "description": "An open benchmark harness for orthopaedic AI: sequential cases, two yardsticks, credit for 'not enough information', process and omission checks, citation title checks, and the keep-or-strike delta.",
+  "type": "module",
+  "license": "Apache-2.0",
+  "bin": { "orthoharness": "bin/orthoharness.mjs" },
+  "engines": { "node": ">=18" },
+  "scripts": { "test": "node --test test/*.test.mjs", "demo": "node bin/orthoharness.mjs run cases/demo --adapter always-operate --offline" },
+  "author": "Blaine Warkentine, MD",
+  "repository": { "type": "git", "url": "https://github.com/blainomd/orthoharness" }
+}
