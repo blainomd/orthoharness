@@ -8,7 +8,7 @@ Site: https://orthoharness.com
 
 Apache-2.0 · Node 18+ · no dependencies · runs offline with `--offline` · nothing leaves your machine except DOIs to CrossRef and, only if you choose the `chat` adapter, the case text to the endpoint you name
 
-> **Status: a reference implementation, not a validated benchmark.** The six cases in `cases/demo/`
+> **Status: a reference implementation, not a validated benchmark.** The seven cases in `cases/demo/`
 > are synthetic, written to exercise the harness. They are not real patients and not clinical
 > guidance, and their reference answers have not been reviewed by a panel. The loss weights in
 > `loss-matrix.json` are placeholders that show the shape. The real cases and weights belong to the
@@ -70,7 +70,7 @@ Each run writes `runs/<label>-<time>.json` (every case, every verdict) and a `.m
 
 ## Case format
 
-One JSON file per case. See `cases/demo/` for six complete examples.
+One JSON file per case. See `cases/demo/` for seven complete examples.
 
 ```json
 {

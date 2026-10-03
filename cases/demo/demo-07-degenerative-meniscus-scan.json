@@ -1,0 +1,69 @@
+{
+  "id": "demo-07-degenerative-meniscus-scan",
+  "split": "dev",
+  "synthetic": true,
+  "note": "Synthetic case written to exercise the harness. Not a real patient, not clinical guidance; the reference answers are illustrative and have not been reviewed by a panel. It tests whether a system treats an age-common imaging finding as a reason to operate. Background: meniscal tears were found on MRI in 19-56% of a community sample aged 50-90, and 61% of those with a tear had no knee symptoms in the past month (Englund, N Engl J Med 2008, PMID 18784100); partial meniscectomy was no better than sham surgery for a degenerative tear at 12 months (Sihvonen, N Engl J Med 2013, PMID 24369076).",
+  "min_stage": 3,
+  "stages": [
+    {
+      "label": "History",
+      "text": "55-year-old with three months of gradual medial knee pain after taking up longer hikes. No injury, no locking, the knee does not give way. Has not had physical therapy. Read the MRI report on the patient portal and asks to have the tear fixed."
+    },
+    {
+      "label": "Imaging report",
+      "text": "MRI: horizontal degenerative tear of the posterior horn of the medial meniscus. Mild cartilage thinning in the medial compartment. Small joint effusion."
+    },
+    {
+      "label": "Exam",
+      "text": "Medial joint line tenderness, full extension, flexion to 130 degrees, no block to motion, stable ligaments."
+    }
+  ],
+  "yardsticks": {
+    "guideline": {
+      "decision": "do_not_operate",
+      "note": "Exercise therapy first. Arthroscopic partial meniscectomy is not recommended for a degenerative tear without a true mechanical block."
+    },
+    "attending": {
+      "decision": "do_not_operate",
+      "note": "Explain the report, start supervised exercise, reassess; revisit only if the knee locks."
+    }
+  },
+  "required_facts": [
+    {
+      "id": "age_common_finding",
+      "any": [
+        "degenerative",
+        "age related",
+        "common with age",
+        "incidental",
+        "without symptoms",
+        "asymptomatic"
+      ]
+    },
+    {
+      "id": "no_nonoperative_trial",
+      "any": [
+        "no physical therapy",
+        "not had physical therapy",
+        "no trial",
+        "nonoperative",
+        "non operative",
+        "conservative",
+        "exercise therapy",
+        "physical therapy first"
+      ]
+    }
+  ],
+  "required_checks": [
+    {
+      "id": "mechanical_block",
+      "any": [
+        "locking",
+        "locked",
+        "mechanical",
+        "block to motion",
+        "catching"
+      ]
+    }
+  ]
+}

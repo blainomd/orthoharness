@@ -20,7 +20,7 @@ async function runAll(adapterName, opts = {}) {
 
 test('demo cases are valid', () => {
   assert.deepEqual(errors, []);
-  assert.equal(cases.length, 6);
+  assert.equal(cases.length, 7);
 });
 
 test('a bad case is rejected (positive control for the validator)', () => {
@@ -33,19 +33,22 @@ test('always-operate pays the heaviest loss where the answer was do-not-operate'
   assert.equal(knee.yardsticks.guideline.loss, loss.loss.do_not_operate.operate);
   assert.equal(knee.premature_commit, true);
   assert.ok(s.results.find((r) => r.id === 'demo-05-shoulder-incomplete').yardsticks.guideline.over_commit);
+  const scan = s.results.find((r) => r.id === 'demo-07-degenerative-meniscus-scan');
+  assert.equal(scan.yardsticks.guideline.loss, loss.loss.do_not_operate.operate);
+  assert.deepEqual(scan.missed_checks, ['mechanical_block']);
 });
 
 test('always-abstain over-abstains, and abstaining is never counted as premature', async () => {
   const s = await runAll('always-abstain');
   assert.equal(s.sequence.premature_commits, 0);
-  assert.equal(s.yardsticks.guideline.over_abstain, 5);
+  assert.equal(s.yardsticks.guideline.over_abstain, 6);
   assert.equal(s.yardsticks.guideline.agree, 1);
 });
 
 test('the two yardsticks are reported apart and there is no single overall score', async () => {
   const s = await runAll('replay', { answers: new URL('../examples/answers-careful.jsonl', import.meta.url).pathname });
-  assert.equal(s.yardsticks.guideline.agree, 5);
-  assert.equal(s.yardsticks.attending.agree, 6);
+  assert.equal(s.yardsticks.guideline.agree, 6);
+  assert.equal(s.yardsticks.attending.agree, 7);
   assert.equal(s.yardstick_gap.sided_with_attending, 1);
   for (const k of ['score', 'overall', 'total_score', 'rank']) assert.equal(k in s, false);
   assert.equal(s.process.missed, 0);

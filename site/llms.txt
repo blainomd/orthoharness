@@ -1,6 +1,6 @@
 # orthoharness
 
-> An open benchmark harness for orthopaedic AI. Apache-2.0, Node 18+, no dependencies. A reference implementation, not a validated benchmark: its six demo cases are synthetic and its loss weights are placeholders.
+> An open benchmark harness for orthopaedic AI. Apache-2.0, Node 18+, no dependencies. A reference implementation, not a validated benchmark: its seven demo cases are synthetic and its loss weights are placeholders.
 
 Code: https://github.com/blainomd/orthoharness
 Why, with sources: https://surgeonvalue.com/docsf#harness
