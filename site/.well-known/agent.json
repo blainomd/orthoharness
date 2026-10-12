@@ -18,7 +18,8 @@
     "loss_weights": "placeholders; the specialty sets the real ones",
     "overall_score": "none by design; results are reported by kind of error",
     "citations": "existence and title are checked at CrossRef; support for the claim is not machine-checked",
-    "patient_facing_ai": "the same bar: score what the patient knows afterwards against the surgeon's own answers on a stated question set; trust is not a yardstick (AMA 2026 physician survey: 81% use AI, 19% draft patient portal replies; a DOCSF 2026 hand-surgery presentation, not yet published, found trust and knowledge did not move together)"
+    "patient_facing_ai": "the same bar: score what the patient knows afterwards against the surgeon's own answers on a stated question set; trust is not a yardstick (AMA 2026 physician survey: 81% use AI, 19% draft patient portal replies; a DOCSF 2026 hand-surgery presentation, not yet published, found trust and knowledge did not move together)",
+    "framing": "The harness credits \"not enough information\" and scores an answer that names where the evidence runs out above one that fills the gap: a synthesis chooses which findings travel and goes quiet where the literature is thin, so a cited answer can still carry a frame nobody chose (Drazen and Haug, NEJM AI 2026, doi 10.1056/AIe2600526)."
   },
   "hand_offs": {
     "why_and_sources": "https://surgeonvalue.com/docsf#harness",
