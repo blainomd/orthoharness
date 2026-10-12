@@ -18,3 +18,6 @@ An open benchmark harness for orthopaedic AI (Apache-2.0, Node 18+, no dependenc
 
 ## Sourcing rule (the Luks and DOCSF digests, 10/3 and 10/12)
 Every number on the site names its source (study or report, year). A conference presentation or a recap may be attributed as such, in words, with "not yet published"; its numbers stay out of the site until the paper exists. Cite the study, never the blog or the post. No "free", no price, no "validated", no "accurate to N".
+
+## Stage vocabulary (Farrow et al., Bone Joint Res 2024, the CPI-AI framework; 10/12)
+Name the stage, never past it. This harness is Stage 1 tooling (synthetic demo cases, placeholder weights) with the Stage 2a discipline built in (a separate case set, per-group reporting). A tool that has not run against an external, real case set does not describe itself past Stage 1, and nothing here claims Stage 2b (prospective, silent reading), Stage 3 (a trial) or Stage 4 (drift surveillance). The "stated case mix" line on the page is the operating boundary: the harness reports where a run applies and where it does not, and credits "not enough information" over a fluent fill (Drazen and Haug, NEJM AI 2026, on synthesis framing).
