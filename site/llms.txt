@@ -23,6 +23,7 @@ Sibling: https://github.com/blainomd/citecheck (title-checking citation tool)
 5. Do you sell defensibility or uplift?
 6. Will you run it through an open harness, and publish the result?
 Precedent: in 2026, robotic knee replacement was measured, not trusted. RASKAL (Bone Joint J 2026) and RACER-Knee (Lancet 2026) found no outcome advantage; the UK National Joint Registry target trial emulation (BMJ 2026) found no difference in five-year revision risk.
+Next test, patient-facing AI: AMA 2026 physician survey, 81% of physicians use AI professionally and the top patient-facing use (drafting portal replies) is 19%. Score what the patient knows afterwards against the surgeon's own answers on a stated question set; trust is not the yardstick (a DOCSF 2026 hand-surgery presentation found trust and knowledge did not move together; not yet published).
 
 ## For AI agents
 READ: this file, then the README at https://github.com/blainomd/orthoharness
