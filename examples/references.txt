@@ -1,0 +1,11 @@
+McCavitt J, et al. ChatGPT-4o Mini Fabricates and Miscites Evidence for American Academy of Orthopaedic Surgeons Hip Fracture Clinical Practice Guidelines. JBJS Open Access. 2026. doi:10.2106/JBJS.OA.25.00225
+
+Parisien R, et al. Epistemic Asymmetry Between Abstracts and Discussion Sections in the Orthopaedic Literature: A Corpus Analysis of 201 Publications. J Bone Joint Surg Am. 2026. https://doi.org/10.2106/JBJS.26.00433
+
+Woo JJ, et al. Custom and Off-the-Shelf Large Language Models Routinely Misinterpret Implant Technique Guides. JBJS Open Access. 2026. doi:10.2106/JBJS.OA.26.00076
+
+A made-up reference that borrows a real DOI: Robotic knee replacement doubles ten-year survival. J Bone Joint Surg Am. 2026. doi:10.2106/JBJS.25.01439
+
+Smith A. A reference with a DOI that does not exist. J Imaginary Orthop. 2026. doi:10.2106/JBJS.99.99999
+
+Jones B. A book chapter with no DOI at all. In: Orthopaedic Knowledge Update. 2025.

@@ -14,6 +14,20 @@ Sibling: https://github.com/blainomd/citecheck (title-checking citation tool)
 - Citations: DOI looked up at CrossRef and title compared; support for the claim is not machine-checked.
 - The keep-or-strike delta between a draft and a signed note; a recorded signer; no single overall score.
 - A sha256 commitment to a private test set.
+- A reference-list screen for journals (`refs`).
+
+## For journals: screen a reference list (https://orthoharness.com/#journals)
+`node bin/orthoharness.mjs refs references.txt` looks up every DOI at CrossRef and compares the returned title with the reference as written; it flags a borrowed or dead DOI, lists references without a DOI, never passes them, does not search by title, and does not check support. Exits 3 if anything is flagged. A flag is a reason to look, not a finding of fabrication.
+Why: 4,046 fabricated references in 2,810 of ~2.5M papers, 98.4% with no publisher action at audit (Topaz, Lancet 2026, doi 10.1016/S0140-6736(26)00603-3); 48% of orthopaedic journal AI policies address AI-generated references (Kelly, JBJS OA 2026, doi 10.2106/JBJS.OA.26.00221).
+
+## 2026 JBJS-journal evidence the harness answers (https://orthoharness.com/#jbjs)
+- OSCAR readiness scale, six stages; accuracy alone = stage 1; scale unvalidated (Byrne, JBJS Rev 2026, doi 10.2106/JBJS.RVW.26.00182). A harness run is stage 1 evidence.
+- LLM retrieval on implant technique guides: all five systems <50%, reasoned questions as low as 15.3% (Woo, JBJS OA 2026, doi 10.2106/JBJS.OA.26.00076).
+- Abstracts vs Discussions in 201 JBJS/CORR papers: 2.8x hedging in Discussions; 6.0% of Abstracts name a limitation (Parisien, JBJS 2026, doi 10.2106/JBJS.26.00433).
+- CONSORT-AI in 11 orthopaedic AI RCTs: 81% of items on average; one data-transparency item 9.1%, code access 45.5% (Strasser, JBJS 2026, doi 10.2106/JBJS.25.01439).
+- LLM vs rules NLP on 719 THA op notes: 96/89/96% vs 94/74/95% (Yang, JBJS 2026, doi 10.2106/JBJS.25.01338).
+- ChatGPT simplification of 806 patient education documents: more Spanish hallucinations than people with GPT-4o; gap closed in an unblinded post hoc GPT-5 check (Nassar, JBJS 2026, doi 10.2106/JBJS.25.00982).
+- Local multi-agent spine systematic review pipeline: kappa 0.87-0.98 vs dual human reviewers, 91% less reviewer time, human in the loop (Muthu, JBJS OA 2026, doi 10.2106/JBJS.OA.26.00102).
 
 ## Six questions for any AI vendor (https://orthoharness.com/#vendor)
 1. What is your error rate, against what reference, on which cases?

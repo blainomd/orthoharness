@@ -102,3 +102,36 @@ test('phrase matching is whole-phrase, not substring', () => {
   assert.equal(mentions('the patient fell', ['fell']), true);
   assert.equal(mentions('the patient felled a tree', ['fell']), false);
 });
+
+test('refs parses blocks, pulls the DOI out of the title, and lists references without one', async () => {
+  const { parseRefs, screenRefs } = await import('../src/refs.mjs');
+  const r = parseRefs('A B. Some real title here. J. 2026. doi:10.2106/JBJS.26.00433.\n\nNo DOI here at all.');
+  assert.equal(r.length, 2);
+  assert.equal(r[0].doi, '10.2106/JBJS.26.00433');
+  assert.equal(r[0].title.includes('10.2106'), false);
+  assert.equal(r[1].doi, null);
+  const s = await screenRefs(readFileSync(new URL('../examples/references.txt', import.meta.url), 'utf8'), { offline: true });
+  assert.equal(s.references, 6);
+  assert.equal(s.counts.NO_DOI, 1);
+  assert.equal(s.counts.UNCHECKED, 5);
+  assert.equal(s.counts.VERIFIED, 0);
+  assert.equal(s.flagged, 0);
+  assert.equal(s.support_read, 0);
+});
+
+test('refs flags a borrowed DOI and a dead one (positive control, CrossRef answers stubbed)', async () => {
+  const { screenRefs } = await import('../src/refs.mjs');
+  const real = 'Epistemic Asymmetry Between Abstracts and Discussion Sections in the Orthopaedic Literature';
+  const cache = new Map([
+    ['10.9999/a', { status: 'ok', title: real }],
+    ['10.9999/b', { status: 'ok', title: real }],
+    ['10.9999/c', { status: 'missing' }],
+  ]);
+  const s = await screenRefs([
+    `X. ${real}. JBJS 2026. doi:10.9999/a`,
+    'Y. Robotic knee replacement doubles ten-year survival. JBJS 2026. doi:10.9999/b',
+    'Z. Anything. doi:10.9999/c',
+  ].join('\n'), { cache });
+  assert.deepEqual(s.rows.map((x) => x.verdict), ['VERIFIED', 'TITLE_MISMATCH', 'DOES_NOT_RESOLVE']);
+  assert.equal(s.flagged, 2);
+});

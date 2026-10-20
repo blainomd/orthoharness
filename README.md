@@ -38,7 +38,7 @@ training data.
 
 ```bash
 git clone https://github.com/blainomd/orthoharness && cd orthoharness
-npm test                                                       # 13 checks, offline
+npm test                                                       # 15 checks, offline
 
 node bin/orthoharness.mjs run cases/demo --adapter always-operate --offline   # baseline: commits every time
 node bin/orthoharness.mjs run cases/demo --adapter always-abstain --offline   # baseline: never commits
@@ -58,6 +58,16 @@ Score a person on the same cases, then compare:
 ```bash
 node bin/orthoharness.mjs run cases/demo --adapter replay --answers my-unaided.jsonl --label unaided --signer "attending surgeon"
 node bin/orthoharness.mjs compare runs/unaided-*.json runs/aided-*.json
+```
+
+Screen a reference list before peer review (for journals and societies). Each DOI is looked up at
+CrossRef and the returned title compared with the reference as written; a borrowed or dead DOI is
+flagged, references without a DOI are listed and never passed, and the command exits 3 if anything
+is flagged. A flag is a reason for a person to look, not a finding of fabrication. It does not
+search by title and does not check whether a paper supports the sentence that cites it:
+
+```bash
+node bin/orthoharness.mjs refs examples/references.txt
 ```
 
 Turn a draft and a signed note into labeled lines:

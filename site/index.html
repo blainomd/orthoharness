@@ -91,7 +91,7 @@ footer p{max-width:none}
 <body>
 <header class="top"><div class="w">
   <a class="brand" href="/">orthoharness</a>
-  <nav class="nav" aria-label="Sections"><a href="#rows">The nine rows</a><a href="#run">Run it</a><a href="#vendor">Ask a vendor</a><a href="#support">Supported by</a><a href="#own">Who owns it</a><a href="https://github.com/blainomd/orthoharness">GitHub</a></nav>
+  <nav class="nav" aria-label="Sections"><a href="#rows">The nine rows</a><a href="#run">Run it</a><a href="#journals">For journals</a><a href="#vendor">Ask a vendor</a><a href="#support">Supported by</a><a href="#own">Who owns it</a><a href="https://github.com/blainomd/orthoharness">GitHub</a></nav>
 </div></header>
 
 <main>
@@ -149,7 +149,7 @@ footer p{max-width:none}
     <p class="k">Run it</p>
     <h2>Clone it, run the tests, score something.</h2>
 <pre>git clone https://github.com/blainomd/orthoharness &amp;&amp; cd orthoharness
-npm test        # 13 checks, offline
+npm test        # 15 checks, offline
 
 node bin/orthoharness.mjs run cases/demo --adapter always-operate --offline
 node bin/orthoharness.mjs run cases/demo --adapter replay --answers examples/answers-careful.jsonl</pre>
@@ -160,6 +160,37 @@ node bin/orthoharness.mjs run cases/demo --adapter replay --answers examples/ans
       <div class="c"><h3>Score a person</h3><p>The replay adapter reads a surgeon&apos;s own recorded answers and grades them by the same rules. <code>compare</code> puts aided and unaided side by side.</p></div>
       <div class="c"><h3>Keep the delta</h3><p><code>delta draft.txt signed.txt</code> labels every kept, struck and added line. A note signed exactly as drafted is flagged: no evidence anyone edited it.</p></div>
       <div class="c"><h3>Keep the exam private</h3><p><code>hash</code> gives a sha256 commitment to a case set. Publish the hash and the loss matrix; withhold the questions.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="journals" class="low">
+  <div class="w">
+    <p class="k">For journals and societies</p>
+    <h2>Screen the reference list <em>before peer review.</em></h2>
+    <p>An audit of about 2.5 million biomedical papers checked 97.1 million references and found 4,046 fabricated ones in 2,810 papers; at the time of the audit, 98.4% of the affected papers had received no publisher action (Topaz, Lancet 2026). In orthopaedics, 29 of 32 journals have an AI policy for authors, but only 48% of those policies say anything about AI-generated references (Kelly, JBJS OA 2026). The US Office of Research Integrity funded a 2026 project to measure the problem and build a tool that helps editors judge how much a fake citation affects a paper (ORI, FY2026 Research Integrity Awards).</p>
+<pre>node bin/orthoharness.mjs refs references.txt          # paste the list, one reference per line or block
+node bin/orthoharness.mjs refs references.txt --json   # exits 3 if any reference is flagged</pre>
+    <div class="grid">
+      <div class="c"><h3>What it does</h3><p>Looks up every DOI at CrossRef, one at a time, and compares the title CrossRef returns with the reference as written. A real DOI pasted under an invented title is flagged; so is a DOI that does not exist.</p></div>
+      <div class="c"><h3>What a flag means</h3><p>A reason for a person to look, not a finding of fabrication: a DOI can fail on a typo. References without a DOI are listed and never passed. It does not search by title.</p></div>
+      <div class="c"><h3>What it cannot tell you</h3><p>Whether the paper supports the sentence that cites it. The report counts that as unread. When someone reads, read past the abstract: only 12 of 201 orthopaedic abstracts named a limitation (Parisien, JBJS 2026).</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="jbjs">
+  <div class="w">
+    <p class="k">What the journals published this year</p>
+    <h2>Seven 2026 papers from the JBJS journals, <em>and what each asks of a harness.</em></h2>
+    <div class="grid">
+      <div class="c"><h3>Accuracy is stage 1</h3><p>OSCAR proposes six stages from model development to monitored deployment; a technically strong model with no external validation stays at stage 1. The authors say the scale itself is unvalidated. A harness run is stage 1 evidence and moves nothing past it. Byrne · JBJS Reviews 2026.</p></div>
+      <div class="c"><h3>Reasoning from a document fails most</h3><p>Five retrieval systems answered 28 questions about three distal femoral replacement technique guides. None reached 50%; reasoned questions scored as low as 15.3%. Hence staged cases, and credit for &ldquo;not enough information&rdquo;. Woo · JBJS Open Access 2026.</p></div>
+      <div class="c"><h3>Abstracts drop the caveats</h3><p>Across 201 JBJS and CORR papers, Discussions carried 2.8 times the hedging of Abstracts, and 6.0% of Abstracts named a limitation. A model that reads abstracts learns the confident version. Parisien · JBJS 2026.</p></div>
+      <div class="c"><h3>Trials hide the data and code</h3><p>Eleven orthopaedic AI randomized trials met 81% of CONSORT-AI items on average, but one data-transparency item was reported by 9.1% and code access by 45.5%. Hence: publish the loss matrix and the case-set hash. Strasser · JBJS 2026.</p></div>
+      <div class="c"><h3>Reading a supplied note works</h3><p>On 719 hip replacement operative notes, prompted LLMs extracted approach, bearing and fixation at 96%, 89% and 96%, against 94%, 74% and 95% for rules-based NLP. Measured per field, against two human annotators. Yang · JBJS 2026.</p></div>
+      <div class="c"><h3>Score each language apart</h3><p>Simplifying 806 patient education documents, ChatGPT-4o matched people on English hallucinations but made more in Spanish; a later model closed the gap in an unblinded post hoc check. One pooled score would have hidden it. Nassar · JBJS 2026.</p></div>
+      <div class="c"><h3>A person stays in the loop</h3><p>A locally run multi-agent pipeline for spine systematic reviews agreed with dual human reviewers (kappa 0.87 to 0.98) and cut reviewer time by 91%; it was validated with a person in the loop, not run without one. Muthu · JBJS Open Access 2026.</p></div>
     </div>
   </div>
 </section>

@@ -8,6 +8,7 @@ import { makeAdapter } from '../src/adapters.mjs';
 import { runCase, gradeCase, summarize } from '../src/run.mjs';
 import { markdown, compare } from '../src/report.mjs';
 import { delta } from '../src/delta.mjs';
+import { screenRefs, refsMarkdown } from '../src/refs.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const USAGE = `orthoharness <command>
@@ -25,6 +26,7 @@ const USAGE = `orthoharness <command>
   hash <cases>                  sha256 commitment to a case set: publish the hash, keep the questions
   compare <run-a.json> <run-b.json>   side by side, e.g. aided vs unaided
   delta <draft.txt> <signed.txt> [--case <id>]   keep-or-strike labels as JSON lines
+  refs <references.txt> [--json] [--offline]   screen a reference list at CrossRef; exits 3 if any reference is flagged
 `;
 
 function args(argv) {
@@ -66,6 +68,13 @@ async function main() {
     const d = delta(readFileSync(pos[0], 'utf8'), readFileSync(pos[1], 'utf8'));
     for (const l of d.lines) console.log(JSON.stringify({ case_id: flags.case ?? null, ...l }));
     console.error(`kept ${d.kept} · struck ${d.struck} · added ${d.added}${d.unchanged ? ' · signed exactly as drafted: no evidence anyone edited it' : ''}`);
+    return;
+  }
+  if (cmd === 'refs') {
+    if (!pos[0]) { process.stdout.write(USAGE); process.exit(1); }
+    const s = await screenRefs(readFileSync(pos[0], 'utf8'), { offline: !!flags.offline });
+    process.stdout.write(flags.json ? JSON.stringify(s, null, 2) + '\n' : refsMarkdown(s));
+    if (s.flagged) process.exit(3);
     return;
   }
   if (cmd !== 'run') { process.stdout.write(USAGE); process.exit(1); }
