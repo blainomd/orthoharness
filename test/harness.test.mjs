@@ -178,6 +178,10 @@ function pubmedStub({ count = 3, designCounts = {}, recs = {} } = {}) {
       if (/\[pt\]/.test(p.term)) return json({ esearchresult: { count: 0, idlist: [] } });
       return json({ esearchresult: { count, idlist: Object.keys(recs).filter((id) => recs[id].relevant) } });
     }
+    if (url.pathname.endsWith('efetch.fcgi')) {
+      const xml = p.id.split(',').filter((i) => recs[i]).map((i) => `<PubmedArticle><PMID Version="1">${i}</PMID><ArticleTitle>${recs[i].title}</ArticleTitle>${recs[i].abstract ? `<AbstractText Label="CONCLUSIONS">${recs[i].abstract}</AbstractText>` : ''}</PubmedArticle>`).join('');
+      return { ok: true, status: 200, text: async () => `<PubmedArticleSet>${xml}</PubmedArticleSet>` };
+    }
     const ids = p.id.split(','); const result = { uids: ids.filter((i) => recs[i]) };
     for (const i of result.uids) result[i] = recs[i];
     return json({ result });
@@ -252,4 +256,42 @@ test('topic: extractIds finds DOIs, PMIDs and pubmed links, and trims punctuatio
 
 test('the site serves the same topic module the CLI runs (byte copy)', () => {
   assert.equal(readFileSync(new URL('../site/topic.mjs', import.meta.url), 'utf8'), readFileSync(new URL('../src/topic.mjs', import.meta.url), 'utf8'));
+});
+
+import { extractQuotes, parseAbstracts, groundedPrompt } from '../src/topic.mjs';
+test('quote gate: a real quote passes, an invented one under the same real PMID is caught, a bare quote has no source', async () => {
+  const recs = { 50: rec('50', 2023, ['Randomized Controlled Trial'], '10.2106/jbjs.q', { abstract: 'There is no evidence that knee injections with PRP have superior effects when compared with placebo.' }) };
+  const f = pubmedStub({ designCounts: { '"Randomized Controlled Trial"[pt]': { count: 1, ids: ['50'] } }, recs });
+  const e = await checkTopic('x', { fetch: f, gap: 0 });
+  const ans = 'It does not help: \u201cthere is NO evidence that knee injections with PRP have superior effects\u201d (PMID 50). '
+    + 'Yet "PRP produced dramatically better outcomes than every other injection" (PMID 50). '
+    + 'And "experts agree this is the best option for all patients".';
+  const a = await checkAnswer(ans, e, { fetch: f, gap: 0 });
+  assert.deepEqual(a.quotes.map((q) => q.verdict), ['QUOTE_IN_SOURCE', 'QUOTE_NOT_IN_ABSTRACT', 'QUOTE_NO_SOURCE']);
+  assert.equal(a.counts.quotes_in_source, 1);
+  assert.ok(topicMarkdown(e, a).includes('may be in the full text'));
+});
+
+test('quote gate: a paper with no abstract is never a pass', async () => {
+  const recs = { 60: rec('60', 2020, ['Journal Article'], null) };
+  const f = pubmedStub({ count: 1, recs: { 60: { ...recs[60], relevant: true } } });
+  const e = await checkTopic('x', { fetch: f, gap: 0 });
+  const a = await checkAnswer('"a long enough quoted claim with many words" (PMID 60)', e, { fetch: f, gap: 0 });
+  assert.equal(a.quotes[0].verdict, 'QUOTE_NO_ABSTRACT');
+});
+
+test('quote extraction: short quotes are ignored; the nearest PMID after, else before, is the source', () => {
+  const q = extractQuotes('PMID 11 says "this short one" and later "a quote with at least five real words" then PMID 22.');
+  assert.equal(q.length, 1);
+  assert.deepEqual(q[0].source, { pmid: '22' });
+  assert.equal(parseAbstracts('<PubmedArticle><PMID>9</PMID><ArticleTitle>T</ArticleTitle></PubmedArticle>')['9'].has_abstract, false);
+});
+
+test('grounded prompt lists only retrieved records and makes "not enough information" a correct answer', async () => {
+  const recs = { 70: rec('70', 2024, ['Meta-Analysis'], '10.1/x') };
+  const e = await checkTopic('acl', { fetch: pubmedStub({ designCounts: { '"Meta-Analysis"[pt]': { count: 1, ids: ['70'] } }, recs }), gap: 0 });
+  const p = groundedPrompt(e);
+  assert.ok(p.includes('PMID 70'));
+  assert.ok(p.includes('not enough information'));
+  assert.ok(p.includes('exact words'));
 });

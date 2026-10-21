@@ -9,7 +9,7 @@ import { runCase, gradeCase, summarize } from '../src/run.mjs';
 import { markdown, compare } from '../src/report.mjs';
 import { delta } from '../src/delta.mjs';
 import { screenRefs, refsMarkdown } from '../src/refs.mjs';
-import { checkTopic, checkAnswer, topicMarkdown, SCOPES } from '../src/topic.mjs';
+import { checkTopic, checkAnswer, topicMarkdown, groundedPrompt, SCOPES } from '../src/topic.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const USAGE = `orthoharness <command>
@@ -30,7 +30,9 @@ const USAGE = `orthoharness <command>
   refs <references.txt> [--json] [--offline]   screen a reference list at CrossRef; exits 3 if any reference is flagged
   topic "<question>" [--scope jbjs|ortho|all] [--since YYYY] [--answer <file>] [--json]
       what the published record holds on a topic, by level of evidence (default scope: every JBJS journal)
-      --answer <file>          check an AI's answer: every DOI/PMID it cites, and the strong evidence it left out
+      --answer <file>          check an AI's answer: every DOI/PMID it cites, every quote against that paper's abstract,
+                               and the strong evidence it left out
+      --prompt                 print the grounded prompt instead: cite only these records, quote each claim's source
 `;
 
 function args(argv) {
@@ -86,6 +88,7 @@ async function main() {
     const scope = flags.scope ?? 'jbjs';
     if (!SCOPES[scope]) { console.error(`scope must be one of ${Object.keys(SCOPES).join(', ')}`); process.exit(1); }
     const e = await checkTopic(pos.join(' '), { scope, since: flags.since, until: flags.until });
+    if (flags.prompt) { process.stdout.write(groundedPrompt(e) + '\n'); return; }
     const a = flags.answer ? await checkAnswer(readFileSync(flags.answer, 'utf8'), e) : null;
     process.stdout.write(flags.json ? JSON.stringify({ evidence: e, answer: a }, null, 2) + '\n' : topicMarkdown(e, a));
     return;

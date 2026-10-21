@@ -126,15 +126,16 @@ h3{font:400 24px/1.25 var(--serif);margin:28px 0 6px}
 <section class="low"><div class="w">
   <p class="k">What this is, and is not</p>
   <p>It reads PubMed&apos;s public index: the JBJS family as PubMed lists it (The Journal of Bone &amp; Joint Surgery American and British volumes, JBJS Reviews, JBJS Open Access, JBJS Essential Surgical Techniques, JBJS Case Connector), about 38,000 articles. It shows titles and links, never abstracts or full text, and it does not summarize: it shows what exists, not what it proves. Levels come from PubMed publication types, and the newest articles may not be typed yet. A citation not found in PubMed is a reason to look, not a finding of fabrication.</p>
-  <p><strong>No AI writes anything on this page.</strong> Every title, year, journal and DOI is copied from the PubMed record; the counts are PubMed&apos;s counts; the verdicts and the &ldquo;runs out&rdquo; lines are fixed rules in open code. The one ranking not done by this code is the order of &ldquo;Most relevant&rdquo;, which is PubMed&apos;s own Best Match. What it cannot check: whether a paper says what an answer claims. That still takes a person reading it.</p>
+  <p><strong>No AI writes anything on this page.</strong> Every title, year, journal and DOI is copied from the PubMed record; the counts are PubMed&apos;s counts; the verdicts and the &ldquo;runs out&rdquo; lines are fixed rules in open code. The one ranking not done by this code is the order of &ldquo;Most relevant&rdquo;, which is PubMed&apos;s own Best Match. Quotes are checked word for word against the paper&apos;s PubMed title and abstract (read to match, never shown), so an invented quote under a real citation is caught. What no rule can check: whether the quoted words mean what the answer says they mean. That still takes a person reading the paper.</p>
   <p>The same check runs from the command line: <code>node bin/orthoharness.mjs topic "your question" --answer ai.txt</code>.</p>
 </div></section>
 <footer><div class="w"><p>orthoharness · Apache-2.0 · a reference implementation, not a validated benchmark · <a href="/">home</a></p></div></footer>
 <script type="module">
-import { checkTopic, checkAnswer } from '/topic.mjs';
+import { checkTopic, checkAnswer, groundedPrompt } from '/topic.mjs';
 const $ = (s) => document.querySelector(s);
 const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
 const VERDICT = { IN_EVIDENCE: 'In the evidence', REAL_OUTSIDE_SEARCH: 'Real, off this search', NOT_IN_PUBMED: 'Not in PubMed', RETRACTED: 'Retracted' };
+const QV = { QUOTE_IN_SOURCE: ['Quote found', 'These exact words are in the paper\'s title or abstract.'], QUOTE_NOT_IN_ABSTRACT: ['Quote not in abstract', 'Not in the abstract. They may be in the full text: read it before relying on this claim.'], QUOTE_NO_ABSTRACT: ['No abstract', 'PubMed has no abstract for this paper: read the full text.'], QUOTE_NO_SOURCE: ['No source', 'No PMID or DOI in the same sentence, so there is nothing to check it against.'] };
 const WHY = { IN_EVIDENCE: 'Real, and in the evidence for this topic.', REAL_OUTSIDE_SEARCH: 'Real, but not in this search (another journal, or other words). Check that it is about this question.', NOT_IN_PUBMED: 'Not in PubMed. Check it by hand; this is not a finding of fabrication.', RETRACTED: 'This paper has been retracted.' };
 function recItem(r) {
   const li = el('li'); const a = el('a', null, r.title + (r.retracted ? ' (RETRACTED)' : ''));
@@ -161,6 +162,12 @@ $('#f').addEventListener('submit', async (ev) => {
     out.append(lv);
     for (const l of e.levels.filter((x) => x.records.length)) out.append(el('h3', null, l.label + ', newest first'), list(l.records));
     if (e.relevant.length) out.append(el('h3', null, 'Most relevant, any level'), list(e.relevant));
+    const gp = groundedPrompt(e); const box = el('div', 'ro');
+    const cp = el('button', 'btn', 'Copy the grounded prompt'); cp.type = 'button';
+    cp.addEventListener('click', async () => { try { await navigator.clipboard.writeText(gp); cp.textContent = 'Copied'; } catch { pre.hidden = false; } });
+    const pre = el('pre', null, gp); pre.hidden = true;
+    box.append(el('p', null, 'Ask any AI with this prompt: it may cite only the records above and must quote the words each claim rests on. Paste its answer back here and every citation and quote is checked.'), cp, pre);
+    out.append(box);
     if (a) {
       out.append(el('h2', null, 'The answer you pasted'));
       if (!a.cited.length) out.append(el('p', 'ro', 'It cites no DOI or PMID, so none of its sources can be checked.'));
@@ -168,6 +175,11 @@ $('#f').addEventListener('submit', async (ev) => {
       for (const c of a.cited) {
         const li = el('li'); li.append(el('span', 'v ' + c.verdict, VERDICT[c.verdict]), el('span', null, c.cited + ': ' + WHY[c.verdict]));
         if (c.record) { const x = el('a', null, ' ' + c.record.title); x.href = c.record.url; x.target = '_blank'; x.rel = 'noopener'; li.append(el('span', 'meta', c.record.year + ' · ' + c.record.journal), x); }
+        ul.append(li);
+      }
+      for (const q of a.quotes) {
+        const li = el('li'); const cls = q.verdict === 'QUOTE_IN_SOURCE' ? 'IN_EVIDENCE' : q.verdict === 'QUOTE_NO_SOURCE' ? 'NOT_IN_PUBMED' : 'REAL_OUTSIDE_SEARCH';
+        li.append(el('span', 'v ' + cls, QV[q.verdict][0]), el('span', null, '\u201c' + (q.quote.length > 140 ? q.quote.slice(0, 137) + '\u2026' : q.quote) + '\u201d '), el('span', 'meta', QV[q.verdict][1] + (q.record ? ' PMID ' + q.record.pmid : '')));
         ul.append(li);
       }
       if (a.unverifiable.length) ul.append(el('li', null, a.unverifiable.length + ' author-year mention(s) with no DOI or PMID, never counted as a pass: ' + a.unverifiable.join('; ')));
