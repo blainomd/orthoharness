@@ -406,3 +406,38 @@ test('the check page imports topic.mjs by its content hash, so a cached old modu
   const h = createHash('sha256').update(readFileSync(new URL('../src/topic.mjs', import.meta.url))).digest('hex').slice(0, 12);
   assert.ok(page.includes(`from '/topic.mjs?v=${h}'`), `update the import in site/check.html to /topic.mjs?v=${h}`);
 });
+
+import { claimFlags, sourceFlags, conclusionOf } from '../src/topic.mjs';
+// The proportion gate, on the case that prompted it (Billi, 2026-10-21; Momtazmanesh et al., Radiology 2026, PMID 42770818).
+const BONE = 'Lower vBMD was associated with faster decline in the global cognitive composite (P = .002), although this did not survive false discovery rate correction. Conclusion Lower vBMD from noncontrast chest CT was associated with modestly accelerated regional WM injury and faster cognitive decline, suggesting utility for detecting accelerated brain aging. ClinicalTrials.gov: NCT00005487';
+const OBS = { pmid: '1', design: 'study' };
+test('proportion: a sentence stronger than its source is flagged; the careful one passes', () => {
+  assert.deepEqual(claimFlags('Bone density is strongly linked to brain aging (PMID 1).', OBS, BONE), ['STRONGER_THAN_SOURCE']);
+  assert.deepEqual(claimFlags('Lower vBMD was associated with modestly faster cognitive decline in this cohort (PMID 1).', OBS, BONE), []);
+});
+test('proportion: detection without reported accuracy, and a dropped limit', () => {
+  assert.deepEqual(claimFlags('Chest CT bone density can detect brain aging (PMID 1).', OBS, BONE), ['PREDICTION_WITHOUT_ACCURACY', 'QUALIFIER_DROPPED']);
+  assert.deepEqual(claimFlags('Chest CT bone density can detect brain aging (PMID 1).', OBS, BONE + ' AUC 0.81.'), ['QUALIFIER_DROPPED']);
+});
+test('proportion: doubt past the source is flagged as well as a promise', () => {
+  assert.deepEqual(claimFlags('There is no evidence bone density relates to cognition (PMID 1).', OBS, BONE), ['DOUBT_PAST_SOURCE']);
+});
+test('proportion: cause from an observational design, but not from a trial', () => {
+  assert.deepEqual(claimFlags('Low bone density causes cognitive decline (PMID 1).', OBS, 'An effect was seen.'), ['CAUSAL_FROM_OBSERVATIONAL']);
+  assert.deepEqual(claimFlags('Tranexamic acid prevents transfusion (PMID 1).', { pmid: '1', design: 'rct' }, 'An effect was seen.'), []);
+});
+test('proportion: the source\'s own conclusion, the sentence that travels', () => {
+  assert.match(conclusionOf(BONE), /^Lower vBMD from noncontrast/);
+  assert.doesNotMatch(conclusionOf(BONE), /ClinicalTrials/);
+  assert.deepEqual(sourceFlags(OBS, BONE), ['CONCLUSION_PREDICTS_WITHOUT_ACCURACY']);
+});
+test('proportion: checkAnswer reports claims and sources end to end', async () => {
+  const recs = { 70: rec('70', 2026, ['Journal Article', 'Observational Study'], null, { abstract: BONE }) };
+  const e = await checkTopic('bone brain', { fetch: pubmedStub({ recs }), gap: 0 });
+  const a = await checkAnswer('Bone density is strongly linked to brain aging (PMID 70). It is a modest association (PMID 70).', e, { fetch: pubmedStub({ recs }), gap: 0 });
+  assert.equal(a.proportion.claims.length, 2);
+  assert.deepEqual(a.proportion.claims[0].flags, ['STRONGER_THAN_SOURCE']);
+  assert.deepEqual(a.proportion.claims[1].flags, []);
+  assert.equal(a.counts.claims_flagged, 1);
+  assert.match(topicMarkdown(e, a), /says it more strongly than the abstract/);
+});

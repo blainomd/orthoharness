@@ -161,15 +161,17 @@ export async function checkAnswer(answer, evidence, opts = {}) {
     record: rec ?? null,
   }));
   const quotes = await quoteGate(get, extractQuotes(answer), found);
+  const proportion = await proportionGate(get, answer, found);
   const citedPmids = new Set(cited.filter((c) => c.record).map((c) => c.record.pmid));
   const left_out = evidence.levels.filter((l) => HIGH.has(l.id)).flatMap((l) => l.records).filter((r) => !citedPmids.has(r.pmid) && !r.retracted);
   return {
-    cited, quotes, unverifiable: bare, left_out,
+    cited, quotes, proportion, unverifiable: bare, left_out,
     counts: {
       cited: cited.length,
       ...Object.fromEntries(['IN_EVIDENCE', 'REAL_OUTSIDE_SEARCH', 'NOT_IN_PUBMED', 'RETRACTED'].map((v) => [v, cited.filter((c) => c.verdict === v).length])),
       unverifiable: bare.length, high_level_left_out: left_out.length,
       quotes: quotes.length, quotes_in_source: quotes.filter((q) => q.verdict === 'QUOTE_IN_SOURCE').length,
+      claims_flagged: proportion.claims.filter((c) => c.flags.length).length, sources_flagged: proportion.sources.length,
     },
   };
 }
@@ -240,6 +242,77 @@ async function quoteGate(get, quotes, resolved) {
   });
 }
 
+// The proportion gate (2026-10-21, after Billi, "The Claims We Don't Quite Make"). The quote gate asks whether
+// the words are in the paper; a sentence can pass it and still claim more than the paper's design shows, because
+// the abstract's own conclusion is often the sentence that outruns it. This gate reads words, not meaning: it
+// names a mismatch between how strongly a sentence speaks and what the cited record's design and abstract
+// report, in either direction (a doubt pushed past the source is flagged as well as a promise). No model is used,
+// and a flag is a reason to read the paper, not a finding.
+const RX = {
+  causal: /\b(causes?|caused|causing|leads? to|led to|prevents?|prevented|protects? against|results? in|drives?)\b/i,
+  predict: /\b(predicts?|predicted|predictive|predictor|detects?|detecting|detection|identif(?:y|ies|ying) (?:individuals|patients|people|those)|diagnos\w*|early warning|your (?:risk|future))\b/i,
+  intense: /\b(strongly|significantly|dramatically|substantially|clearly|proves?|proven|definitively|major)\b/i,
+  doubt: /\b(no (?:evidence|link|effect|association|benefit|relationship)|debunk\w*|disprov\w*|a myth|does not (?:work|matter)|has no effect)\b/i,
+  hedge: /\b(may|might|could|suggests?|suggesting|associat\w+|linked|correlat\w+|modest\w*|small|weak|in (?:one|this|a) (?:study|cohort)|observational|not (?:yet )?(?:sufficient|proven|established))\b/i,
+  modest: /\b(modest\w*|small(?:er)?|weak(?:ly)?|slight(?:ly)?)\b/i,
+  limit: /(causal\w*|causation)\s+(?:cannot|could not|can ?not|was not|is not)\s+(?:be\s+)?(?:inferred|established|determined)|not (?:yet )?sufficient for individual|did not survive|no(?:t)? (?:statistically )?significant/i,
+  accuracy: /\b(AUC|area under the (?:receiver|curve)|C[- ]statistic|c-index|sensitivity|specificity|positive predictive|negative predictive|discriminat\w+)\b/i,
+  signif: /\bP\s*(?:<|=|≤)\s*0?\.0[0-4]\d*|\bP\s*<\s*0?\.001/i,
+};
+const STRONG_DESIGN = new Set(['guideline', 'meta', 'rct', 'trial']);
+export function conclusionOf(text) {
+  const t = String(text ?? '');
+  const m = /\bConclusions?(?: and (?:Clinical )?Relevance)?\s*[:.]?\s+([\s\S]+?)(?:\s+(?:Level of Evidence|ClinicalTrials\.gov|Trial registration|©)|$)/i.exec(t);
+  if (m) return m[1].trim();
+  const sents = t.split(/(?<=[.!?])\s+(?=[A-Z])/); return (sents[sents.length - 1] ?? '').trim();
+}
+export function claimFlags(sentence, rec, abstractText) {
+  const s = String(sentence), a = String(abstractText ?? ''), design = rec?.design ?? 'study';
+  const flags = [];
+  const hedged = RX.hedge.test(s);
+  if (RX.causal.test(s) && !STRONG_DESIGN.has(design) && !hedged) flags.push('CAUSAL_FROM_OBSERVATIONAL');
+  if (RX.predict.test(s) && a && !RX.accuracy.test(a)) flags.push('PREDICTION_WITHOUT_ACCURACY');
+  if (RX.intense.test(s) && RX.modest.test(a)) flags.push('STRONGER_THAN_SOURCE');
+  if (!hedged && RX.limit.test(a) && !RX.doubt.test(s)) flags.push('QUALIFIER_DROPPED');
+  if (RX.doubt.test(s) && RX.signif.test(a)) flags.push('DOUBT_PAST_SOURCE');
+  return flags;
+}
+export function sourceFlags(rec, abstractText) {
+  const c = conclusionOf(abstractText);
+  if (!c) return [];
+  const flags = [];
+  if (RX.predict.test(c) && !RX.accuracy.test(abstractText)) flags.push('CONCLUSION_PREDICTS_WITHOUT_ACCURACY');
+  if (RX.causal.test(c) && !STRONG_DESIGN.has(rec?.design ?? 'study') && !RX.hedge.test(c)) flags.push('CONCLUSION_CAUSAL_FROM_OBSERVATIONAL');
+  return flags;
+}
+export function sentencesWithIds(text) {
+  return String(text ?? '').split(/(?<=[.!?])\s+(?=[A-Z"“(])/).map((t) => t.trim()).filter(Boolean)
+    .map((t) => ({ text: t, ids: extractIds(t) })).filter((x) => x.ids.pmids.length || x.ids.dois.length);
+}
+async function proportionGate(get, answer, resolved) {
+  const pmids = [...new Set(resolved.map((r) => r.pmid))];
+  const src = pmids.length ? parseAbstracts(await get('efetch.fcgi', { id: pmids.join(','), rettype: 'abstract', retmode: 'xml' })) : {};
+  const find = (ids) => resolved.find((r) => ids.pmids.includes(r.pmid) || (r.doi && ids.dois.includes(r.doi.toLowerCase())));
+  const claims = sentencesWithIds(answer).map((x) => {
+    const rec = find(x.ids); const a = rec ? src[rec.pmid]?.text ?? '' : '';
+    return { sentence: x.text, record: rec ?? null, has_abstract: Boolean(a), flags: rec && a ? claimFlags(x.text, rec, a) : [] };
+  }).filter((c) => c.record);
+  const sources = resolved.map((rec) => {
+    const a = src[rec.pmid]?.text ?? '';
+    return { record: rec, design: rec.design, conclusion: conclusionOf(a), flags: a ? sourceFlags(rec, a) : [] };
+  }).filter((x) => x.flags.length);
+  return { claims, sources };
+}
+export const PROPORTION_WORDS = {
+  CAUSAL_FROM_OBSERVATIONAL: 'speaks of cause, but the cited paper is not a trial or a review of trials',
+  PREDICTION_WITHOUT_ACCURACY: 'speaks of predicting or detecting, but the abstract reports no accuracy (AUC, sensitivity, specificity)',
+  STRONGER_THAN_SOURCE: 'says it more strongly than the abstract, which calls the effect modest or small',
+  QUALIFIER_DROPPED: 'drops a limit the abstract states (cause not shown, not significant, or not for individuals)',
+  DOUBT_PAST_SOURCE: 'doubts more than the source does: the abstract reports a statistically significant finding',
+  CONCLUSION_PREDICTS_WITHOUT_ACCURACY: 'the paper\'s own conclusion speaks of predicting or detecting, and its abstract reports no accuracy: this is the sentence that travels',
+  CONCLUSION_CAUSAL_FROM_OBSERVATIONAL: 'the paper\'s own conclusion speaks of cause from a design that cannot show it',
+};
+
 // The instruction that turns a model into one the gates can check: cite only from this list,
 // quote the sentence that supports each claim, and say so when the list does not answer it.
 // Pass the abstracts (fetchAbstracts) or the model is asked to quote words it was never shown.
@@ -290,6 +363,8 @@ export function topicMarkdown(e, a = null) {
     if (!a.cited.length) L.push('It cites no DOI or PMID, so none of its sources can be checked.');
     for (const c of a.cited) L.push(`- ${c.cited}: ${VERDICT_WORDS[c.verdict]}${c.record ? ` (${c.record.year} · ${c.record.journal} · ${c.record.title})` : ''}`);
     for (const q of a.quotes ?? []) L.push(`- "${q.quote.length > 120 ? q.quote.slice(0, 117) + '…' : q.quote}": ${VERDICT_WORDS[q.verdict]}${q.record ? ` (PMID ${q.record.pmid})` : ''}`);
+    for (const c of a.proportion?.claims ?? []) for (const f of c.flags) L.push(`- "${c.sentence.length > 120 ? c.sentence.slice(0, 117) + '…' : c.sentence}": ${PROPORTION_WORDS[f]} (PMID ${c.record.pmid})`);
+    for (const x of a.proportion?.sources ?? []) for (const f of x.flags) L.push(`- PMID ${x.record.pmid}: ${PROPORTION_WORDS[f]}. Its conclusion: "${x.conclusion.length > 200 ? x.conclusion.slice(0, 197) + '…' : x.conclusion}"`);
     if (a.unverifiable.length) L.push(`- ${a.unverifiable.length} author-year ${a.unverifiable.length === 1 ? 'mention' : 'mentions'} with no DOI or PMID (${a.unverifiable.join('; ')}): cannot be checked, never counted as a pass`);
     L.push('', a.left_out.length ? `**Strong evidence the answer did not cite (${a.left_out.length}):**` : 'It cites every guideline, meta-analysis and randomized trial shown above.', '');
     L.push(...a.left_out.map(line), '');

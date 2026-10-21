@@ -125,13 +125,14 @@ h3{font:400 24px/1.25 var(--serif);margin:28px 0 6px}
 </div></section>
 <section class="low"><div class="w">
   <p class="k">What this is, and is not</p>
-  <p>It reads PubMed&apos;s public index: the JBJS family as PubMed lists it (The Journal of Bone &amp; Joint Surgery American and British volumes, JBJS Reviews, JBJS Open Access, JBJS Essential Surgical Techniques, JBJS Case Connector), about 38,000 articles. It shows titles and links, never abstracts or full text, and it does not summarize: it shows what exists, not what it proves. Levels come from PubMed publication types, and the newest articles may not be typed yet. A citation not found in PubMed is a reason to look, not a finding of fabrication.</p>
+  <p>It reads PubMed&apos;s public index: the JBJS family as PubMed lists it (The Journal of Bone &amp; Joint Surgery American and British volumes, JBJS Reviews, JBJS Open Access, JBJS Essential Surgical Techniques, JBJS Case Connector), about 38,000 articles. It shows titles and links, never full text or whole abstracts (one sentence only: a cited paper&apos;s own conclusion, when the proportion check flags it), and it does not summarize: it shows what exists, not what it proves. Levels come from PubMed publication types, and the newest articles may not be typed yet. A citation not found in PubMed is a reason to look, not a finding of fabrication.</p>
   <p><strong>No AI writes anything on this page.</strong> Every title, year, journal and DOI is copied from the PubMed record; the counts are PubMed&apos;s counts; the verdicts and the &ldquo;runs out&rdquo; lines are fixed rules in open code. The one ranking not done by this code is the order of &ldquo;Most relevant&rdquo;, which is PubMed&apos;s own Best Match. Quotes are checked word for word against the paper&apos;s PubMed title and abstract (read to match, never shown), so an invented quote under a real citation is caught. What no rule can check: whether the quoted words mean what the answer says they mean. That still takes a person reading the paper.</p>
+  <p><strong>The proportion check.</strong> A quote can be word for word in the paper and still claim more than the paper shows, because an abstract&apos;s conclusion is often the sentence that outruns its own study (Billi, <a href="https://fbilli.substack.com" target="_blank" rel="noopener">The Claims We Don&apos;t Quite Make</a>, 2026). Each sentence of a pasted answer that cites a PMID or DOI is compared with that paper&apos;s design and abstract: cause claimed from a study that is not a trial; predicting or detecting with no accuracy figure reported; &ldquo;strongly&rdquo; where the abstract says modest; a stated limit dropped; and doubt pushed past the source (&ldquo;no evidence&rdquo; for a paper that reports a significant finding), because an AI that agrees with your skepticism amplifies it as easily as it amplifies a promise. The cited paper&apos;s own conclusion is checked the same way. It reads words, not meaning: a flag is a reason to read the paper, never a finding.</p>
   <p>The same check runs from the command line: <code>node bin/orthoharness.mjs topic "your question" --answer ai.txt</code>.</p>
 </div></section>
 <footer><div class="w"><p>orthoharness · Apache-2.0 · a reference implementation, not a validated benchmark · <a href="/">home</a></p></div></footer>
 <script type="module">
-import { checkTopic, checkAnswer, groundedPrompt, fetchAbstracts } from '/topic.mjs?v=3efc184909da';
+import { checkTopic, checkAnswer, groundedPrompt, fetchAbstracts, PROPORTION_WORDS } from '/topic.mjs?v=b86ccb524428';
 const $ = (s) => document.querySelector(s);
 const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
 const VERDICT = { IN_EVIDENCE: 'In the evidence', REAL_OUTSIDE_SEARCH: 'Real, off this search', NOT_IN_PUBMED: 'Not in PubMed', RETRACTED: 'Retracted' };
@@ -186,6 +187,15 @@ $('#f').addEventListener('submit', async (ev) => {
       for (const q of a.quotes) {
         const li = el('li'); const cls = q.verdict === 'QUOTE_IN_SOURCE' ? 'IN_EVIDENCE' : q.verdict === 'QUOTE_NO_SOURCE' ? 'NOT_IN_PUBMED' : 'REAL_OUTSIDE_SEARCH';
         li.append(el('span', 'v ' + cls, QV[q.verdict][0]), el('span', null, '\u201c' + (q.quote.length > 140 ? q.quote.slice(0, 137) + '\u2026' : q.quote) + '\u201d '), el('span', 'meta', QV[q.verdict][1] + (q.record ? ' PMID ' + q.record.pmid : '')));
+        ul.append(li);
+      }
+      for (const c of a.proportion.claims) {
+        const li = el('li'); const ok = !c.flags.length;
+        li.append(el('span', 'v ' + (ok ? 'IN_EVIDENCE' : 'REAL_OUTSIDE_SEARCH'), ok ? 'In proportion' : 'Says more'), el('span', null, '\u201c' + (c.sentence.length > 140 ? c.sentence.slice(0, 137) + '\u2026' : c.sentence) + '\u201d '), el('span', 'meta', ok ? 'no mismatch found between how strongly it speaks and what PMID ' + c.record.pmid + ' reports (a word check, not a reading)' : c.flags.map((f) => PROPORTION_WORDS[f]).join('; ') + ' (PMID ' + c.record.pmid + ')'));
+        ul.append(li);
+      }
+      for (const x of a.proportion.sources) {
+        const li = el('li'); li.append(el('span', 'v REAL_OUTSIDE_SEARCH', 'The source'), el('span', null, 'PMID ' + x.record.pmid + ': ' + x.flags.map((f) => PROPORTION_WORDS[f]).join('; ') + '. '), el('span', 'meta', 'Its conclusion: \u201c' + (x.conclusion.length > 220 ? x.conclusion.slice(0, 217) + '\u2026' : x.conclusion) + '\u201d'));
         ul.append(li);
       }
       if (a.unverifiable.length) ul.append(el('li', null, a.unverifiable.length + ' author-year mention(s) with no DOI or PMID, never counted as a pass: ' + a.unverifiable.join('; ')));

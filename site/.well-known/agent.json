@@ -39,12 +39,12 @@
     "framing": "The harness credits \"not enough information\" and scores an answer that names where the evidence runs out above one that fills the gap: a synthesis chooses which findings travel and goes quiet where the literature is thin, so a cited answer can still carry a frame nobody chose (Drazen and Haug, NEJM AI 2026, doi 10.1056/AIe2600526).",
     "reference_screen": "refs looks up each DOI at CrossRef and compares the title with the reference as written; a flag is a reason to look, not a finding; references without a DOI are listed, never passed; no title search; support for the citing sentence is not checked",
     "readiness_stage": "a harness run is stage 1 evidence on the OSCAR scale (Byrne, JBJS Reviews 2026, doi 10.2106/JBJS.RVW.26.00182) and moves nothing past it",
-    "topic_check": "default scope is every JBJS journal PubMed indexes (about 38,000 articles); levels come from PubMed publication types; titles and links only; it reports what exists, not what it shows"
+    "topic_check": "default scope is every JBJS journal PubMed indexes (about 38,000 articles); levels come from PubMed publication types; titles and links only; it reports what exists, not what it shows; proportion_check flags a cited sentence that claims more than its paper's design and abstract show (cause from a non-trial, detection with no accuracy reported, stronger than a modest effect, a dropped limit) or doubts past a significant finding, and flags the paper's own conclusion the same way; word rules, a reason to read, never a finding"
   },
   "hand_offs": {
     "why_and_sources": "https://surgeonvalue.com/docsf#harness",
     "citation_check": "https://github.com/blainomd/citecheck",
     "jbjs_evidence": "https://orthoharness.com/#jbjs"
   },
-  "updated": "2026-10-20"
+  "updated": "2026-10-21"
 }
