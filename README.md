@@ -44,11 +44,39 @@ real but outside this search, not in PubMed, retracted), lists author-year menti
 strong evidence the answer did not cite. It reads PubMed's public index, titles and links only, and never summarizes.
 `--scope ortho` widens to 22 orthopaedic journals, `--scope all` to all of PubMed.
 
+## Ask a model, gated
+
+`ask` runs the whole loop on one question and keeps only what a fixed rule can check:
+
+1. **Retrieve.** The same PubMed search as `topic`, plus each record's abstract.
+2. **Constrain.** The model gets the grounded prompt: cite only these records, quote each claim's words from the
+   abstract, and "not enough information" is a correct answer.
+3. **Gate.** Every sentence of the reply gets one verdict. **Kept**: every cited record is in the evidence and at
+   least one quote is found word for word in a cited abstract. **Listed**: it quotes only a paper's title, which
+   names the paper and supports nothing. **Struck**: it cites something outside the evidence, quotes words that are
+   not in the abstract, or cites without quoting. **Uncited**: not shown as supported. **Abstained**: says the
+   records do not answer it.
+4. **Receipt.** The question, the query, the PMIDs retrieved, the model name, and sha256 of the prompt, the reply and
+   the receipt itself. The key and the endpoint address are never recorded.
+
+```bash
+ORTHOHARNESS_BASE_URL=http://localhost:11434/v1 ORTHOHARNESS_MODEL=gemma4:12b ORTHOHARNESS_REASONING_EFFORT=none \
+  node bin/orthoharness.mjs ask "tranexamic acid total knee arthroplasty blood loss"
+```
+
+An empty reply, a reply cut off at the token limit, or a prompt the server's context window cut short is an
+error, never "nothing survived". `ORTHOHARNESS_REASONING_EFFORT=none` turns off a local reasoning model's hidden
+thinking (sent only when set); `ORTHOHARNESS_MAX_TOKENS` raises the reply limit (default 6000).
+
+What no rule checks: whether a kept quote means what its sentence says, and whether the abstract itself is right.
+In the first live run a kept sentence faithfully quoted an abstract whose confidence interval does not contain its
+own estimate. A person still reads what was kept.
+
 ## Run it
 
 ```bash
 git clone https://github.com/blainomd/orthoharness && cd orthoharness
-npm test                                                       # 15 checks, offline
+npm test                                                       # 38 checks, offline
 
 node bin/orthoharness.mjs run cases/demo --adapter always-operate --offline   # baseline: commits every time
 node bin/orthoharness.mjs run cases/demo --adapter always-abstain --offline   # baseline: never commits

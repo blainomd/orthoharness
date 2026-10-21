@@ -175,20 +175,22 @@ export async function checkAnswer(answer, evidence, opts = {}) {
 }
 
 // The quote gate. A claim that quotes its source can be checked without reading for meaning:
-// the quoted words either appear in that paper's PubMed title or abstract, or they do not.
-// Abstracts are read to match against, never shown. A quote not in the abstract may be in the
+// the quoted words either appear in that paper's PubMed abstract, or they do not (its title alone does not count).
+// Abstracts are matched against and handed to the model to quote; the page never displays them. A quote not in the abstract may be in the
 // full text, so that verdict is a reason to look, not a finding of fabrication.
 export function squash(s) {
   return String(s ?? '').normalize('NFKD').replace(/[̀-ͯ]/g, '').toLowerCase()
-    .replace(/<[^>]+>/g, ' ').replace(/&[a-z]+;|&#\d+;/g, ' ').replace(/[^a-z0-9]+/g, ' ').trim();
+    .replace(/<[^>]+>/g, ' ').replace(/&[a-z]+;|&#x[0-9a-f]+;|&#\d+;/gi, ' ').replace(/[^a-z0-9]+/g, ' ').trim();
 }
 
 export function extractQuotes(text) {
   const s = String(text ?? '');
   const out = [];
-  for (const m of s.matchAll(/["“]([^"“”]{20,600})["”]/g)) {
+  // Pair quote marks in order first, then skip the short ones: filtering inside the pattern would
+  // pair a short quote's closing mark with the next quote's opening one.
+  for (const m of s.matchAll(/["“]([^"“”]*)["”]/g)) {
     const quote = m[1].trim();
-    if (squash(quote).split(' ').length < 5) continue;
+    if (quote.length < 20 || quote.length > 600 || squash(quote).split(' ').length < 5) continue;
     const end = m.index + m[0].length;
     // Look only inside the quote's own sentence, so a bare quote never borrows its neighbour's citation.
     const tail = s.slice(end, end + 160); const stop = tail.search(/[.!?]\s+(?=[A-Z"\u201c])/);
@@ -208,9 +210,18 @@ export function parseAbstracts(xml) {
     if (!pmid) continue;
     const title = /<ArticleTitle[^>]*>([\s\S]*?)<\/ArticleTitle>/.exec(block)?.[1] ?? '';
     const abs = [...block.matchAll(/<AbstractText[^>]*>([\s\S]*?)<\/AbstractText>/g)].map((x) => x[1]).join(' ');
-    out[pmid] = { title: squash(title), abstract: squash(abs), has_abstract: Boolean(abs.trim()) };
+    const text = abs.replace(/<[^>]+>/g, ' ').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&').replace(/&#?[a-z0-9]+;/gi, ' ').replace(/\s+/g, ' ').trim();
+    out[pmid] = { title: squash(title), abstract: squash(abs), has_abstract: Boolean(abs.trim()), text };
   }
   return out;
+}
+
+// The abstracts a model is allowed to quote: one PubMed request for every record in the evidence.
+export async function fetchAbstracts(evidence, opts = {}) {
+  const pmids = [...new Set([...evidence.levels.flatMap((l) => l.records), ...evidence.relevant].map((r) => r.pmid))];
+  if (!pmids.length) return {};
+  const parsed = parseAbstracts(await client(opts.fetch, opts.gap)('efetch.fcgi', { id: pmids.join(','), rettype: 'abstract', retmode: 'xml' }));
+  return Object.fromEntries(Object.entries(parsed).filter(([, v]) => v.text).map(([k, v]) => [k, v.text]));
 }
 
 async function quoteGate(get, quotes, resolved) {
@@ -222,24 +233,32 @@ async function quoteGate(get, quotes, resolved) {
     if (!i.record) return { quote: i.quote, verdict: 'QUOTE_NO_SOURCE', record: null };
     const t = src[i.record.pmid];
     const q = squash(i.quote);
-    if (t && (t.abstract.includes(q) || t.title.includes(q))) return { quote: i.quote, verdict: 'QUOTE_IN_SOURCE', record: i.record };
+    if (t && t.abstract.includes(q)) return { quote: i.quote, verdict: 'QUOTE_IN_SOURCE', record: i.record };
+    // A paper's own title is always found in its own record, so quoting it proves nothing about a claim.
+    if (t && t.title.includes(q)) return { quote: i.quote, verdict: 'QUOTE_IS_TITLE', record: i.record };
     return { quote: i.quote, verdict: t?.has_abstract ? 'QUOTE_NOT_IN_ABSTRACT' : 'QUOTE_NO_ABSTRACT', record: i.record };
   });
 }
 
 // The instruction that turns a model into one the gates can check: cite only from this list,
 // quote the sentence that supports each claim, and say so when the list does not answer it.
-export function groundedPrompt(e) {
+// Pass the abstracts (fetchAbstracts) or the model is asked to quote words it was never shown.
+export function groundedPrompt(e, abstracts = null) {
   const recs = [...new Map([...e.levels.flatMap((l) => l.records), ...e.relevant].map((r) => [r.pmid, r])).values()];
+  const ab = (r) => {
+    if (!abstracts) return [];
+    const t = abstracts[r.pmid];
+    return [t ? `  Abstract: ${t.length > 1600 ? t.slice(0, 1600) + ' [abstract cut here]' : t}` : '  Abstract: none in PubMed (do not quote this record)'];
+  };
   return [
     `Question: ${e.topic}`,
     '',
     `You may cite only these records (${e.scope_label}, from PubMed). Do not cite anything else.`,
-    ...recs.map((r) => `- PMID ${r.pmid} · ${r.year ?? ''} · ${r.journal} · ${DESIGNS.find((d) => d.id === r.design)?.label ?? r.design} · ${r.title}`),
+    ...recs.flatMap((r) => [`- PMID ${r.pmid} · ${r.year ?? ''} · ${r.journal} · ${DESIGNS.find((d) => d.id === r.design)?.label ?? r.design} · ${r.title}`, ...ab(r)]),
     '',
     'Rules:',
     '1. Every claim ends with the PMID it rests on, written as (PMID 12345678).',
-    '2. Every claim quotes, in double quotes, the exact words from that paper\'s title or abstract that support it. Copy them; do not paraphrase inside the quotes.',
+    '2. Every claim quotes, in double quotes, the exact words from that paper\'s abstract that support it (a finding, not the title). Copy them; do not paraphrase inside the quotes.',
     '3. If these records do not answer the question, say "not enough information" and say what is missing. That is a correct answer.',
     '4. Name the level of each source (guideline, meta-analysis, randomized trial, other). Prefer the highest level.',
     ...e.runs_out.map((n) => `Note: ${n}`),
@@ -251,7 +270,8 @@ const VERDICT_WORDS = {
   REAL_OUTSIDE_SEARCH: 'real, but not in this search (another journal, or other words): check that it is about this question',
   NOT_IN_PUBMED: 'not in PubMed: check it by hand (not a finding of fabrication)',
   RETRACTED: 'retracted',
-  QUOTE_IN_SOURCE: 'the quoted words are in that paper\'s title or abstract',
+  QUOTE_IN_SOURCE: 'the quoted words are in that paper\'s abstract',
+  QUOTE_IS_TITLE: 'the quoted words are the paper\'s title: that names the paper, it does not support a claim',
   QUOTE_NOT_IN_ABSTRACT: 'the quoted words are not in that paper\'s abstract: they may be in the full text, so read it',
   QUOTE_NO_ABSTRACT: 'PubMed has no abstract for that paper: read the full text',
   QUOTE_NO_SOURCE: 'no PMID or DOI next to the quote, so there is nothing to check it against',

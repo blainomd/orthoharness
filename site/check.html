@@ -131,11 +131,11 @@ h3{font:400 24px/1.25 var(--serif);margin:28px 0 6px}
 </div></section>
 <footer><div class="w"><p>orthoharness · Apache-2.0 · a reference implementation, not a validated benchmark · <a href="/">home</a></p></div></footer>
 <script type="module">
-import { checkTopic, checkAnswer, groundedPrompt } from '/topic.mjs';
+import { checkTopic, checkAnswer, groundedPrompt, fetchAbstracts } from '/topic.mjs';
 const $ = (s) => document.querySelector(s);
 const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
 const VERDICT = { IN_EVIDENCE: 'In the evidence', REAL_OUTSIDE_SEARCH: 'Real, off this search', NOT_IN_PUBMED: 'Not in PubMed', RETRACTED: 'Retracted' };
-const QV = { QUOTE_IN_SOURCE: ['Quote found', 'These exact words are in the paper\'s title or abstract.'], QUOTE_NOT_IN_ABSTRACT: ['Quote not in abstract', 'Not in the abstract. They may be in the full text: read it before relying on this claim.'], QUOTE_NO_ABSTRACT: ['No abstract', 'PubMed has no abstract for this paper: read the full text.'], QUOTE_NO_SOURCE: ['No source', 'No PMID or DOI in the same sentence, so there is nothing to check it against.'] };
+const QV = { QUOTE_IN_SOURCE: ['Quote found', 'These exact words are in the paper\'s abstract.'], QUOTE_IS_TITLE: ['Title only', 'These words are the paper\'s title. That names the paper; it does not support the claim.'], QUOTE_NOT_IN_ABSTRACT: ['Quote not in abstract', 'Not in the abstract. They may be in the full text: read it before relying on this claim.'], QUOTE_NO_ABSTRACT: ['No abstract', 'PubMed has no abstract for this paper: read the full text.'], QUOTE_NO_SOURCE: ['No source', 'No PMID or DOI in the same sentence, so there is nothing to check it against.'] };
 const WHY = { IN_EVIDENCE: 'Real, and in the evidence for this topic.', REAL_OUTSIDE_SEARCH: 'Real, but not in this search (another journal, or other words). Check that it is about this question.', NOT_IN_PUBMED: 'Not in PubMed. Check it by hand; this is not a finding of fabrication.', RETRACTED: 'This paper has been retracted.' };
 function recItem(r) {
   const li = el('li'); const a = el('a', null, r.title + (r.retracted ? ' (RETRACTED)' : ''));
@@ -162,11 +162,17 @@ $('#f').addEventListener('submit', async (ev) => {
     out.append(lv);
     for (const l of e.levels.filter((x) => x.records.length)) out.append(el('h3', null, l.label + ', newest first'), list(l.records));
     if (e.relevant.length) out.append(el('h3', null, 'Most relevant, any level'), list(e.relevant));
-    const gp = groundedPrompt(e); const box = el('div', 'ro');
+    const box = el('div', 'ro');
     const cp = el('button', 'btn', 'Copy the grounded prompt'); cp.type = 'button';
-    cp.addEventListener('click', async () => { try { await navigator.clipboard.writeText(gp); cp.textContent = 'Copied'; } catch { pre.hidden = false; } });
-    const pre = el('pre', null, gp); pre.hidden = true;
-    box.append(el('p', null, 'Ask any AI with this prompt: it may cite only the records above and must quote the words each claim rests on. Paste its answer back here and every citation and quote is checked.'), cp, pre);
+    const pre = el('pre'); pre.hidden = true;
+    cp.addEventListener('click', async () => {
+      cp.disabled = true; cp.textContent = 'Fetching the abstracts\u2026';
+      let gp;
+      try { gp = groundedPrompt(e, await fetchAbstracts(e)); } catch { cp.disabled = false; cp.textContent = 'PubMed did not answer: try again'; return; }
+      pre.textContent = gp; cp.disabled = false;
+      try { await navigator.clipboard.writeText(gp); cp.textContent = 'Copied'; } catch { cp.textContent = 'Select and copy the prompt below'; pre.hidden = false; }
+    });
+    box.append(el('p', null, 'Ask any AI with this prompt. It lists the records above with their PubMed abstracts, so the AI can quote the words each claim rests on and may cite nothing else. Paste its answer back here and every citation and quote is checked.'), cp, pre);
     out.append(box);
     if (a) {
       out.append(el('h2', null, 'The answer you pasted'));

@@ -258,7 +258,7 @@ test('the site serves the same topic module the CLI runs (byte copy)', () => {
   assert.equal(readFileSync(new URL('../site/topic.mjs', import.meta.url), 'utf8'), readFileSync(new URL('../src/topic.mjs', import.meta.url), 'utf8'));
 });
 
-import { extractQuotes, parseAbstracts, groundedPrompt } from '../src/topic.mjs';
+import { extractQuotes, parseAbstracts, groundedPrompt, squash } from '../src/topic.mjs';
 test('quote gate: a real quote passes, an invented one under the same real PMID is caught, a bare quote has no source', async () => {
   const recs = { 50: rec('50', 2023, ['Randomized Controlled Trial'], '10.2106/jbjs.q', { abstract: 'There is no evidence that knee injections with PRP have superior effects when compared with placebo.' }) };
   const f = pubmedStub({ designCounts: { '"Randomized Controlled Trial"[pt]': { count: 1, ids: ['50'] } }, recs });
@@ -294,4 +294,109 @@ test('grounded prompt lists only retrieved records and makes "not enough informa
   assert.ok(p.includes('PMID 70'));
   assert.ok(p.includes('not enough information'));
   assert.ok(p.includes('exact words'));
+});
+
+test('quote gate: quoting a paper\'s own title is not support; its abstract is (positive control)', async () => {
+  const recs = { 80: rec('80', 2022, ['Meta-Analysis'], '10.2106/jbjs.t', { title: 'Tranexamic acid in total knee replacement a meta analysis', abstract: 'Tranexamic acid reduced total blood loss by a mean of 591 ml without raising the rate of thrombosis.' }) };
+  const f = pubmedStub({ designCounts: { '"Meta-Analysis"[pt]': { count: 1, ids: ['80'] } }, recs });
+  const e = await checkTopic('x', { fetch: f, gap: 0 });
+  const a = await checkAnswer('See "Tranexamic acid in total knee replacement a meta analysis" (PMID 80). It "reduced total blood loss by a mean of 591 ml" (PMID 80).', e, { fetch: f, gap: 0 });
+  assert.deepEqual(a.quotes.map((q) => q.verdict), ['QUOTE_IS_TITLE', 'QUOTE_IN_SOURCE']);
+  assert.ok(groundedPrompt(e).includes('not the title'));
+});
+
+import { ask, gateSentences, sentences, complete, askMarkdown, GATE_VERSION } from '../src/ask.mjs';
+import { createHash } from 'node:crypto';
+
+function askStub(reply, recs, extra = {}) {
+  const pm = pubmedStub({ designCounts: { '"Meta-Analysis"[pt]': { count: 1, ids: ['80'] } }, recs });
+  const calls = [];
+  const f = async (u, init) => {
+    if (String(u).includes('/chat/completions')) {
+      calls.push({ u, init });
+      return { ok: true, status: 200, json: async () => ({ choices: [{ finish_reason: extra.finish ?? 'stop', message: { content: reply } }], ...(extra.usage ? { usage: extra.usage } : {}) }) };
+    }
+    return pm(u);
+  };
+  f.calls = calls;
+  return f;
+}
+const ASK_RECS = {
+  80: rec('80', 2022, ['Meta-Analysis'], '10.2106/jbjs.t', { title: 'Tranexamic acid in total knee replacement a meta analysis', abstract: 'Tranexamic acid reduced total blood loss by a mean of 591 ml without raising the rate of thrombosis.' }),
+  20: rec('20', 2019, ['Journal Article'], null, { abstract: 'Platelet rich plasma injections for knee osteoarthritis improved pain scores at six months.' }),
+};
+
+test('ask: each sentence gets one verdict; only an abstract quote under an evidence PMID is kept', async () => {
+  const reply = [
+    'TXA "reduced total blood loss by a mean of 591 ml" (PMID 80).',
+    'Meta-analysis: "Tranexamic acid in total knee replacement a meta analysis" (PMID 80).',
+    'It "eliminated the need for transfusion in every patient studied" (PMID 80).',
+    'PRP "improved pain scores at six months" in a related paper (PMID 20).',
+    'TXA is safe for everyone.',
+    'There is not enough information on dosing in these records.',
+  ].join('\n');
+  const f = askStub(reply, ASK_RECS);
+  const r = await ask('txa tka', { fetch: f, gap: 0, baseUrl: 'http://model.local/v1', model: 'm', apiKey: 'sk-test-not-real', now: '2026-10-21T00:00:00Z' });
+  assert.deepEqual(r.gated.map((g) => g.verdict), ['KEPT', 'LISTED', 'STRUCK', 'STRUCK', 'UNCITED', 'ABSTAINED']);
+  assert.match(r.gated[2].reason, /not in the cited abstract/);
+  assert.match(r.gated[3].reason, /outside the retrieved records/);
+  assert.deepEqual([r.receipt.kept, r.receipt.listed, r.receipt.struck, r.receipt.uncited, r.receipt.abstained], [1, 1, 2, 1, 1]);
+  assert.equal(r.receipt.gate, GATE_VERSION);
+  // the receipt hash covers everything else in it, and the key and endpoint are never recorded
+  const { receipt_sha256, ...body } = r.receipt;
+  assert.equal(receipt_sha256, createHash('sha256').update(JSON.stringify(body)).digest('hex'));
+  assert.equal(r.receipt.reply_sha256, createHash('sha256').update(reply).digest('hex'));
+  const md = askMarkdown(r);
+  assert.ok(!JSON.stringify(r.receipt).includes('sk-test') && !md.includes('sk-test') && !md.includes('model.local'));
+  assert.equal(f.calls[0].init.headers.authorization, 'Bearer sk-test-not-real');
+  assert.ok(md.includes('Listed papers, no claim checked (1)'));
+});
+
+test('ask: an empty or cut-off model reply is an error, never "nothing survived"', async () => {
+  await assert.rejects(ask('txa', { fetch: askStub('', ASK_RECS, { finish: 'length' }), gap: 0, baseUrl: 'http://m/v1', model: 'm' }), /no answer text \(finish_reason: length\)/);
+  await assert.rejects(ask('txa', { fetch: askStub('TXA "reduced total blood loss by a mean', ASK_RECS, { finish: 'length' }), gap: 0, baseUrl: 'http://m/v1', model: 'm' }), /cut off/);
+  await assert.rejects(complete('p', { fetch: async () => ({ ok: true }) }), /ORTHOHARNESS_BASE_URL/);
+  // positive control: the same stub with a normal reply runs
+  const ok = await complete('p', { baseUrl: 'http://m/v1', model: 'm', fetch: askStub('fine.', ASK_RECS) });
+  assert.equal(ok, 'fine.');
+});
+
+test('ask: reasoning_effort is sent only when set; thinking blocks are stripped', async () => {
+  const f = askStub('<think>long private reasoning</think>Answer.', ASK_RECS);
+  assert.equal(await complete('p', { baseUrl: 'http://m/v1', model: 'm', fetch: f }), 'Answer.');
+  await complete('p', { baseUrl: 'http://m/v1', model: 'm', reasoningEffort: 'none', fetch: f });
+  const bodies = f.calls.map((c) => JSON.parse(c.init.body));
+  assert.equal('reasoning_effort' in bodies[0], false);
+  assert.equal(bodies[1].reasoning_effort, 'none');
+});
+
+test('sentences: quotes and "et al." do not split a sentence', () => {
+  assert.deepEqual(sentences('Smith et al. found "a drop. then a rise" here (PMID 1). Next one.'), ['Smith et al. found "a drop. then a rise" here (PMID 1).', 'Next one.']);
+  assert.equal(gateSentences('', { cited: [], quotes: [] }).length, 0);
+});
+
+test('ask: the model is shown each record\'s abstract, so it can quote it; a record with none says so', async () => {
+  const recs = { ...ASK_RECS, 81: { ...rec('81', 2021, ['Journal Article'], null), relevant: true } };
+  const f = askStub('There is not enough information.', recs);
+  const r = await ask('txa', { fetch: f, gap: 0, baseUrl: 'http://m/v1', model: 'm' });
+  assert.ok(r.prompt.includes('Abstract: Tranexamic acid reduced total blood loss by a mean of 591 ml'));
+  assert.ok(r.prompt.includes('Abstract: none in PubMed (do not quote this record)'));
+  assert.equal(r.receipt.abstracts_given, 1);
+  // without abstracts the prompt carries titles only (the site preview and old callers)
+  assert.ok(!groundedPrompt(r.evidence).includes('Abstract:'));
+});
+
+test('ask: a prompt the server cut short is an error; a full one passes (positive control)', async () => {
+  const long = 'x'.repeat(8000);
+  await assert.rejects(complete(long, { baseUrl: 'http://m/v1', model: 'm', fetch: askStub('ok.', ASK_RECS, { usage: { prompt_tokens: 500 } }) }), /context window cut/);
+  assert.equal(await complete(long, { baseUrl: 'http://m/v1', model: 'm', fetch: askStub('ok.', ASK_RECS, { usage: { prompt_tokens: 2000 } }) }), 'ok.');
+});
+
+test('quote gate: hex entities like &#xb1; (±) match, and a short quote never pairs with the next one', async () => {
+  const xml = '<PubmedArticle><PMID>90</PMID><ArticleTitle>T</ArticleTitle><AbstractText>Blood loss was 348.1 &#xb1; 158.2 mL on day 1 &#x2264; day 3.</AbstractText></PubmedArticle>';
+  const a = parseAbstracts(xml)['90'];
+  assert.ok(a.abstract.includes(squash('Blood loss was 348.1 ± 158.2 mL on day 1')));
+  assert.ok(!a.abstract.includes('xb1'));
+  const q = extractQuotes('TXA is "effective and safe" (PMID 1) and "safe in patients with a history of coronary disease" (PMID 2).');
+  assert.deepEqual(q.map((x) => [x.quote, x.source.pmid]), [['safe in patients with a history of coronary disease', '2']]);
 });

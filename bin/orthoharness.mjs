@@ -9,7 +9,8 @@ import { runCase, gradeCase, summarize } from '../src/run.mjs';
 import { markdown, compare } from '../src/report.mjs';
 import { delta } from '../src/delta.mjs';
 import { screenRefs, refsMarkdown } from '../src/refs.mjs';
-import { checkTopic, checkAnswer, topicMarkdown, groundedPrompt, SCOPES } from '../src/topic.mjs';
+import { checkTopic, checkAnswer, topicMarkdown, groundedPrompt, fetchAbstracts, SCOPES } from '../src/topic.mjs';
+import { ask, askMarkdown } from '../src/ask.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const USAGE = `orthoharness <command>
@@ -32,7 +33,11 @@ const USAGE = `orthoharness <command>
       what the published record holds on a topic, by level of evidence (default scope: every JBJS journal)
       --answer <file>          check an AI's answer: every DOI/PMID it cites, every quote against that paper's abstract,
                                and the strong evidence it left out
-      --prompt                 print the grounded prompt instead: cite only these records, quote each claim's source
+      --prompt                 print the grounded prompt instead: cite only these records (with their abstracts), quote each claim's words
+  ask "<question>" [--scope jbjs|ortho|all] [--since YYYY] [--json] [--out <file>]
+      retrieve the record, ask a model with the grounded prompt, gate every sentence, keep only what survives,
+      and write a receipt (reads ORTHOHARNESS_BASE_URL, ORTHOHARNESS_MODEL, ORTHOHARNESS_API_KEY; the key is never recorded;
+      optional ORTHOHARNESS_REASONING_EFFORT=none for local reasoning models, ORTHOHARNESS_MAX_TOKENS, default 6000)
 `;
 
 function args(argv) {
@@ -83,12 +88,25 @@ async function main() {
     if (s.flagged) process.exit(3);
     return;
   }
+  if (cmd === 'ask') {
+    if (!pos[0]) { process.stdout.write(USAGE); process.exit(1); }
+    const scope = flags.scope ?? 'jbjs';
+    if (!SCOPES[scope]) { console.error(`scope must be one of ${Object.keys(SCOPES).join(', ')}`); process.exit(1); }
+    const r = await ask(pos.join(' '), { scope, since: flags.since, until: flags.until,
+      baseUrl: process.env.ORTHOHARNESS_BASE_URL, model: process.env.ORTHOHARNESS_MODEL, apiKey: process.env.ORTHOHARNESS_API_KEY,
+      maxTokens: process.env.ORTHOHARNESS_MAX_TOKENS ? Number(process.env.ORTHOHARNESS_MAX_TOKENS) : undefined,
+      reasoningEffort: process.env.ORTHOHARNESS_REASONING_EFFORT || undefined });
+    const text = flags.json ? JSON.stringify({ receipt: r.receipt, gated: r.gated, reply: r.reply, prompt: r.prompt }, null, 2) + '\n' : askMarkdown(r);
+    if (flags.out) writeFileSync(flags.out, text);
+    process.stdout.write(text);
+    return;
+  }
   if (cmd === 'topic') {
     if (!pos[0]) { process.stdout.write(USAGE); process.exit(1); }
     const scope = flags.scope ?? 'jbjs';
     if (!SCOPES[scope]) { console.error(`scope must be one of ${Object.keys(SCOPES).join(', ')}`); process.exit(1); }
     const e = await checkTopic(pos.join(' '), { scope, since: flags.since, until: flags.until });
-    if (flags.prompt) { process.stdout.write(groundedPrompt(e) + '\n'); return; }
+    if (flags.prompt) { process.stdout.write(groundedPrompt(e, await fetchAbstracts(e)) + '\n'); return; }
     const a = flags.answer ? await checkAnswer(readFileSync(flags.answer, 'utf8'), e) : null;
     process.stdout.write(flags.json ? JSON.stringify({ evidence: e, answer: a }, null, 2) + '\n' : topicMarkdown(e, a));
     return;
