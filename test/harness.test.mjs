@@ -400,3 +400,9 @@ test('quote gate: hex entities like &#xb1; (±) match, and a short quote never p
   const q = extractQuotes('TXA is "effective and safe" (PMID 1) and "safe in patients with a history of coronary disease" (PMID 2).');
   assert.deepEqual(q.map((x) => [x.quote, x.source.pmid]), [['safe in patients with a history of coronary disease', '2']]);
 });
+
+test('the check page imports topic.mjs by its content hash, so a cached old module can never load with a new page', () => {
+  const page = readFileSync(new URL('../site/check.html', import.meta.url), 'utf8');
+  const h = createHash('sha256').update(readFileSync(new URL('../src/topic.mjs', import.meta.url))).digest('hex').slice(0, 12);
+  assert.ok(page.includes(`from '/topic.mjs?v=${h}'`), `update the import in site/check.html to /topic.mjs?v=${h}`);
+});

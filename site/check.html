@@ -131,7 +131,7 @@ h3{font:400 24px/1.25 var(--serif);margin:28px 0 6px}
 </div></section>
 <footer><div class="w"><p>orthoharness · Apache-2.0 · a reference implementation, not a validated benchmark · <a href="/">home</a></p></div></footer>
 <script type="module">
-import { checkTopic, checkAnswer, groundedPrompt, fetchAbstracts } from '/topic.mjs';
+import { checkTopic, checkAnswer, groundedPrompt, fetchAbstracts } from '/topic.mjs?v=3efc184909da';
 const $ = (s) => document.querySelector(s);
 const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
 const VERDICT = { IN_EVIDENCE: 'In the evidence', REAL_OUTSIDE_SEARCH: 'Real, off this search', NOT_IN_PUBMED: 'Not in PubMed', RETRACTED: 'Retracted' };
