@@ -6,6 +6,14 @@
   "code": "https://github.com/blainomd/orthoharness",
   "actions": [
     {
+      "name": "check_topic",
+      "how": "https://orthoharness.com/check (browser), or git clone https://github.com/blainomd/orthoharness && node bin/orthoharness.mjs topic \"question\" [--answer ai.txt] [--scope jbjs|ortho|all] [--since YYYY]",
+      "auth": "none",
+      "uploads_data": false,
+      "sends": "the topic and any cited DOIs/PMIDs, to PubMed (eutils.ncbi.nlm.nih.gov) only",
+      "safe_to_hand_to_user": true
+    },
+    {
       "name": "run_benchmark",
       "how": "git clone https://github.com/blainomd/orthoharness && node bin/orthoharness.mjs run cases/demo --adapter chat",
       "auth": "none",
@@ -30,7 +38,8 @@
     "patient_facing_ai": "the same bar: score what the patient knows afterwards against the surgeon's own answers on a stated question set; trust is not a yardstick (AMA 2026 physician survey: 81% use AI, 19% draft patient portal replies; a DOCSF 2026 hand-surgery presentation, not yet published, found trust and knowledge did not move together)",
     "framing": "The harness credits \"not enough information\" and scores an answer that names where the evidence runs out above one that fills the gap: a synthesis chooses which findings travel and goes quiet where the literature is thin, so a cited answer can still carry a frame nobody chose (Drazen and Haug, NEJM AI 2026, doi 10.1056/AIe2600526).",
     "reference_screen": "refs looks up each DOI at CrossRef and compares the title with the reference as written; a flag is a reason to look, not a finding; references without a DOI are listed, never passed; no title search; support for the citing sentence is not checked",
-    "readiness_stage": "a harness run is stage 1 evidence on the OSCAR scale (Byrne, JBJS Reviews 2026, doi 10.2106/JBJS.RVW.26.00182) and moves nothing past it"
+    "readiness_stage": "a harness run is stage 1 evidence on the OSCAR scale (Byrne, JBJS Reviews 2026, doi 10.2106/JBJS.RVW.26.00182) and moves nothing past it",
+    "topic_check": "default scope is every JBJS journal PubMed indexes (about 38,000 articles); levels come from PubMed publication types; titles and links only; it reports what exists, not what it shows"
   },
   "hand_offs": {
     "why_and_sources": "https://surgeonvalue.com/docsf#harness",

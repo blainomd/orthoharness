@@ -34,6 +34,16 @@ commitment to a case set. **Publish the hash and the loss matrix; withhold the q
 run report carries the hash, so results are tied to a version without the exam leaking into
 training data.
 
+## Check a topic against JBJS
+
+`node bin/orthoharness.mjs topic "platelet-rich plasma knee osteoarthritis" --answer ai.txt`, or in a browser at
+[orthoharness.com/check](https://orthoharness.com/check). It counts every matching article across the JBJS journals by
+level (guideline, meta-analysis or systematic review, randomized trial, other trial), lists the newest at each level and
+says where the evidence runs out. With `--answer`, it checks every DOI and PMID an AI answer cites (in the evidence,
+real but outside this search, not in PubMed, retracted), lists author-year mentions it cannot check, and lists the
+strong evidence the answer did not cite. It reads PubMed's public index, titles and links only, and never summarizes.
+`--scope ortho` widens to 22 orthopaedic journals, `--scope all` to all of PubMed.
+
 ## Run it
 
 ```bash

@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Check a topic · orthoharness</title>
+<meta name="description" content="Type an orthopaedic question and see what every JBJS journal has published on it, by level of evidence, with where the evidence runs out. Paste an AI answer to check each citation it gives and the strong evidence it left out.">
+<link rel="canonical" href="https://orthoharness.com/check">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230a1220'/%3E%3Cpath d='M8 23 L16 8 L24 23 M11.5 17.5 H20.5' fill='none' stroke='%2310b981' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<meta property="og:title" content="Check a topic against everything JBJS has published">
+<meta property="og:description" content="An open benchmark harness for orthopaedic AI. Apache-2.0, no dependencies.">
+<meta property="og:url" content="https://orthoharness.com/check">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#0a1220">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600&family=Source+Serif+4:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a1220;--low:#0d1729;--card:#111d33;--line:#1f2d45;--text:#eef2f8;--mute:#a7b3c6;--dim:#7d8aa0;--mint:#10b981;--mint2:#34d399;--amber:#f59e0b;--serif:"Source Serif 4",Georgia,serif;--mono:"JetBrains Mono",ui-monospace,monospace}
+@media (prefers-color-scheme: light){:root:not([data-theme="dark"]){--bg:#fbfaf7;--low:#f3f1ec;--card:#ffffff;--line:#e3ded4;--text:#141821;--mute:#4a5160;--dim:#6b7180;--mint:#047857;--mint2:#047857;--amber:#b45309}}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font:400 17px/1.65 Inter,system-ui,sans-serif}
+a{color:var(--mint2)}
+.w{max-width:1080px;margin:0 auto;padding:0 20px}
+header.top{border-bottom:1px solid var(--line)}
+header.top .w{display:flex;justify-content:space-between;align-items:center;min-height:60px;gap:12px}
+.brand{font:600 15px/1 var(--mono);color:var(--text);text-decoration:none;letter-spacing:.02em}
+.nav{display:flex;gap:4px;flex-wrap:wrap}
+.nav a{display:inline-flex;align-items:center;min-height:44px;padding:0 10px;font:500 12px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mute);text-decoration:none}
+.hero{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:48px;align-items:center}
+section{padding:72px 0;border-bottom:1px solid var(--line)}
+section.low{background:var(--low)}
+.k{margin:0 0 14px;font:600 11px/1.4 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--mint2)}
+h1{margin:0 0 22px;font:400 clamp(40px,7vw,76px)/1.03 var(--serif);letter-spacing:-.02em}
+h1 em,h2 em{color:var(--amber)}
+h2{margin:0 0 18px;font:400 clamp(28px,4vw,42px)/1.15 var(--serif);letter-spacing:-.01em}
+p.lead{max-width:760px;font-size:19px;color:var(--mute);margin:0 0 28px}
+p{max-width:760px;color:var(--mute)}
+.qn{color:var(--mint2);font-family:var(--mono);margin-right:4px}
+.grid+p{margin-top:28px}
+.btns{display:flex;flex-wrap:wrap;gap:12px;margin-top:8px}
+.btn{display:inline-flex;align-items:center;min-height:48px;padding:0 20px;border:1px solid var(--line);border-radius:3px;font:600 13px/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;text-decoration:none;color:var(--text);background:var(--card)}
+.btn.p{background:var(--mint);border-color:var(--mint);color:#04130d}
+.status{margin-top:28px;padding:14px 16px;border-left:3px solid var(--amber);background:var(--card);font-size:14px;color:var(--mute);max-width:760px}
+ol.rows{list-style:none;margin:28px 0 0;padding:0;border-top:1px solid var(--line)}
+.rh,.r{display:grid;grid-template-columns:40px minmax(0,1fr) minmax(0,1.6fr);gap:0 24px}
+.rh{padding:12px 0;font:600 11px/1.4 var(--mono);letter-spacing:.1em;text-transform:uppercase;border-bottom:1px solid var(--line)}
+.rh span:nth-child(2){color:var(--amber)}.rh span:nth-child(3){color:var(--mint2)}
+.r{padding:18px 0;border-bottom:1px solid var(--line)}
+.n{font:400 26px/1 var(--serif);color:var(--dim)}
+.today{margin:0;font:400 20px/1.3 var(--serif);color:var(--mute)}
+.fix{margin:0;color:var(--text);border-left:2px solid var(--mint);padding-left:14px;font-size:16px;line-height:1.55;max-width:none}
+.src{margin:8px 0 0;padding-left:16px;font:500 11px/16px var(--mono);color:var(--dim);max-width:none}
+pre{margin:14px 0 22px;padding:16px;background:#050b15;color:#c7f9e3;border:1px solid var(--line);border-radius:3px;font:500 13px/1.6 var(--mono);overflow-x:auto;white-space:pre}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:24px}
+.c{background:var(--card);padding:24px}
+.c h3{margin:0 0 8px;font:400 22px/1.25 var(--serif)}
+.c p{margin:0;font-size:15px}
+.pull{margin:36px 0 0;padding-left:18px;border-left:3px solid var(--amber);font:italic 400 clamp(22px,2.6vw,30px)/1.35 var(--serif);color:var(--text);max-width:860px}
+footer{padding:40px 0 calc(40px + env(safe-area-inset-bottom));font-size:14px;color:var(--dim)}
+footer p{max-width:none}
+@media (max-width:860px){
+ section{padding:52px 0}
+ .rh{display:none}
+ .r{grid-template-columns:32px minmax(0,1fr);gap:8px 12px}
+ .r>div{grid-column:2}
+ .n{grid-row:span 2;font-size:22px}
+ .today{font-size:18px}
+ .today::before{content:"Today: ";font:600 11px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--amber)}
+ .grid{grid-template-columns:1fr}
+ .nav a{padding:0 8px;font-size:11px}
+ .nav a:not(:last-child){display:none}
+}
+.sup{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:24px}
+.sup a{display:block;background:var(--card);padding:20px 22px;text-decoration:none;min-height:44px}
+.sup b{display:block;font:600 14px/1.3 var(--mono);color:var(--text);margin-bottom:6px}
+.sup span{display:block;font-size:14px;line-height:1.5;color:var(--mute)}
+@media (max-width:860px){.sup{grid-template-columns:1fr}}
+
+form{display:grid;gap:14px;max-width:820px}
+label{font:600 11px/1.4 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--mint2)}
+input[type=text],textarea,select{width:100%;padding:14px 16px;background:var(--card);color:var(--text);border:1px solid var(--line);border-radius:3px;font:400 17px/1.5 Inter,system-ui,sans-serif}
+textarea{min-height:120px;resize:vertical}
+input:focus,textarea:focus,select:focus,.btn:focus{outline:2px solid var(--mint2);outline-offset:2px}
+.row2{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:14px}
+@media (max-width:640px){.row2{grid-template-columns:1fr}}
+button.btn{cursor:pointer}
+.note{font-size:14px;color:var(--dim);margin:0}
+#out{margin-top:36px}
+.lv{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);margin:18px 0}
+.lv div{background:var(--card);padding:16px}
+.lv b{display:block;font:400 34px/1 var(--serif);font-variant-numeric:tabular-nums}
+.lv span{font:500 11px/1.4 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--mute)}
+@media (max-width:640px){.lv{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.ro{margin:18px 0;padding:14px 16px;border-left:3px solid var(--amber);background:var(--card);color:var(--text);max-width:820px}
+ul.recs{list-style:none;padding:0;margin:8px 0 26px;max-width:860px}
+ul.recs li{padding:12px 0;border-bottom:1px solid var(--line)}
+ul.recs a{color:var(--text);text-decoration:none}
+ul.recs a:hover{color:var(--mint2)}
+.meta{display:block;font:500 12px/1.5 var(--mono);color:var(--dim)}
+.v{display:inline-block;margin-right:8px;padding:2px 8px;border-radius:2px;font:600 11px/1.6 var(--mono);letter-spacing:.06em;text-transform:uppercase}
+.v.IN_EVIDENCE{background:var(--mint);color:#04130d}
+.v.REAL_OUTSIDE_SEARCH,.v.NOT_IN_PUBMED{background:var(--amber);color:#1a1000}
+.v.RETRACTED{background:#b91c1c;color:#fff}
+h3{font:400 24px/1.25 var(--serif);margin:28px 0 6px}
+</style>
+</head>
+<body>
+<header class="top"><div class="w"><a class="brand" href="/">orthoharness</a><nav class="nav" aria-label="Sections"><a href="/check">Check a topic</a><a href="/#rows">The ten rows</a><a href="https://github.com/blainomd/orthoharness">GitHub</a></nav></div></header>
+<section><div class="w">
+  <p class="k">Check a topic</p>
+  <h1>What has JBJS <em>actually</em> published on it?</h1>
+  <p class="lead">Type a question. See every matching article across the JBJS journals by level of evidence, newest first, and where the evidence runs out. Paste what an AI told you, and each citation it gives is checked against the same record.</p>
+  <form id="f">
+    <div><label for="topic">Topic</label><input type="text" id="topic" name="topic" required maxlength="300" placeholder="e.g. platelet-rich plasma knee osteoarthritis" value="platelet-rich plasma knee osteoarthritis"></div>
+    <div class="row2">
+      <div><label for="scope">Where to look</label><select id="scope" name="scope"><option value="jbjs">Every JBJS journal</option><option value="ortho">Orthopaedic journals</option><option value="all">All of PubMed</option></select></div>
+      <div><label for="since">Published since</label><input type="text" id="since" name="since" inputmode="numeric" maxlength="4" placeholder="any year"></div>
+    </div>
+    <div><label for="answer">An AI answer to check (optional)</label><textarea id="answer" name="answer" placeholder="Paste the answer, with its citations. DOIs and PMIDs are checked; an author-year mention with neither is listed, never passed."></textarea></div>
+    <p class="note">Never type patient information. The question goes from your browser straight to PubMed; nothing is stored, and nothing passes through this site.</p>
+    <div class="btns"><button class="btn p" id="go" type="submit">Check</button></div>
+  </form>
+  <div id="out" aria-live="polite"></div>
+</div></section>
+<section class="low"><div class="w">
+  <p class="k">What this is, and is not</p>
+  <p>It reads PubMed&apos;s public index: the JBJS family as PubMed lists it (The Journal of Bone &amp; Joint Surgery American and British volumes, JBJS Reviews, JBJS Open Access, JBJS Essential Surgical Techniques, JBJS Case Connector), about 38,000 articles. It shows titles and links, never abstracts or full text, and it does not summarize: it shows what exists, not what it proves. Levels come from PubMed publication types, and the newest articles may not be typed yet. A citation not found in PubMed is a reason to look, not a finding of fabrication.</p>
+  <p>The same check runs from the command line: <code>node bin/orthoharness.mjs topic "your question" --answer ai.txt</code>.</p>
+</div></section>
+<footer><div class="w"><p>orthoharness · Apache-2.0 · a reference implementation, not a validated benchmark · <a href="/">home</a></p></div></footer>
+<script type="module">
+import { checkTopic, checkAnswer } from '/topic.mjs';
+const $ = (s) => document.querySelector(s);
+const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+const VERDICT = { IN_EVIDENCE: 'In the evidence', REAL_OUTSIDE_SEARCH: 'Real, off this search', NOT_IN_PUBMED: 'Not in PubMed', RETRACTED: 'Retracted' };
+const WHY = { IN_EVIDENCE: 'Real, and in the evidence for this topic.', REAL_OUTSIDE_SEARCH: 'Real, but not in this search (another journal, or other words). Check that it is about this question.', NOT_IN_PUBMED: 'Not in PubMed. Check it by hand; this is not a finding of fabrication.', RETRACTED: 'This paper has been retracted.' };
+function recItem(r) {
+  const li = el('li'); const a = el('a', null, r.title + (r.retracted ? ' (RETRACTED)' : ''));
+  a.href = r.url; a.target = '_blank'; a.rel = 'noopener';
+  li.append(a, el('span', 'meta', [r.year ?? '–', r.journal, r.doi ? 'doi ' + r.doi : null].filter(Boolean).join(' · ')));
+  return li;
+}
+function list(recs) { const ul = el('ul', 'recs'); recs.forEach((r) => ul.append(recItem(r))); return ul; }
+$('#f').addEventListener('submit', async (ev) => {
+  ev.preventDefault();
+  const out = $('#out'); const go = $('#go');
+  const topic = $('#topic').value.trim(); if (!topic) return;
+  const since = /^\d{4}$/.test($('#since').value.trim()) ? $('#since').value.trim() : undefined;
+  go.disabled = true; go.textContent = 'Checking PubMed…'; out.replaceChildren(el('p', 'note', 'Asking PubMed, a few requests a second, as it asks of everyone.'));
+  try {
+    const e = await checkTopic(topic, { scope: $('#scope').value, since });
+    const answer = $('#answer').value.trim();
+    const a = answer ? await checkAnswer(answer, e) : null;
+    out.replaceChildren();
+    out.append(el('h2', null, e.total.toLocaleString() + ' matching ' + (e.total === 1 ? 'article' : 'articles')), el('p', 'note', e.scope_label + ' · PubMed · titles and links only'));
+    for (const n of e.runs_out) out.append(el('p', 'ro', n));
+    const lv = el('div', 'lv');
+    for (const l of e.levels) { const d = el('div'); d.append(el('b', null, String(l.count)), el('span', null, l.label)); lv.append(d); }
+    out.append(lv);
+    for (const l of e.levels.filter((x) => x.records.length)) out.append(el('h3', null, l.label + ', newest first'), list(l.records));
+    if (e.relevant.length) out.append(el('h3', null, 'Most relevant, any level'), list(e.relevant));
+    if (a) {
+      out.append(el('h2', null, 'The answer you pasted'));
+      if (!a.cited.length) out.append(el('p', 'ro', 'It cites no DOI or PMID, so none of its sources can be checked.'));
+      const ul = el('ul', 'recs');
+      for (const c of a.cited) {
+        const li = el('li'); li.append(el('span', 'v ' + c.verdict, VERDICT[c.verdict]), el('span', null, c.cited + ': ' + WHY[c.verdict]));
+        if (c.record) { const x = el('a', null, ' ' + c.record.title); x.href = c.record.url; x.target = '_blank'; x.rel = 'noopener'; li.append(el('span', 'meta', c.record.year + ' · ' + c.record.journal), x); }
+        ul.append(li);
+      }
+      if (a.unverifiable.length) ul.append(el('li', null, a.unverifiable.length + ' author-year mention(s) with no DOI or PMID, never counted as a pass: ' + a.unverifiable.join('; ')));
+      out.append(ul);
+      out.append(el('h3', null, a.left_out.length ? 'Strong evidence the answer did not cite (' + a.left_out.length + ')' : 'It cites every guideline, meta-analysis and randomized trial shown above.'));
+      if (a.left_out.length) out.append(list(a.left_out));
+    }
+  } catch (err) {
+    out.replaceChildren(el('p', 'ro', 'PubMed did not answer (' + err.message + '). Wait a minute and try again.'));
+  } finally { go.disabled = false; go.textContent = 'Check'; }
+});
+</script>
+</body>
+</html>
