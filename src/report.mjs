@@ -11,6 +11,11 @@ export function markdown(s) {
   L.push('| Yardstick | Agrees | Decision loss (lower is better) | Over-committed | Over-abstained |', '|---|---|---|---|---|');
   y('guideline', 'Guideline'); y('attending', 'Treating attending');
   L.push('', 'The two rows are never averaged. Where they disagree, the gap is the finding.', '');
+  for (const [k, label] of [['guideline', 'guideline'], ['attending', 'attending']]) {
+    const v = s.yardsticks[k];
+    if (v.agreements_with_stated_reasons) L.push(`**Right for the wrong reason (${label}):** ${v.right_for_wrong_reason} of ${v.agreements_with_stated_reasons} agreements on cases where the ${label} names its reasons (the decision matched, the rationale named none of them).`);
+  }
+  L.push('');
   const g = s.yardstick_gap;
   L.push(`**Where the yardsticks disagree (${g.cases} ${g.cases === 1 ? "case" : "cases"}):** sided with the guideline ${g.sided_with_guideline}, with the attending ${g.sided_with_attending}, neither ${g.neither}.`, '');
   L.push('## The route, not just the answer', '');

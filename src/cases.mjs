@@ -15,6 +15,8 @@ export function validateCase(c, file = '') {
   const y = c.yardsticks || {};
   for (const k of ['guideline', 'attending']) {
     if (!y[k] || !DECISIONS.includes(y[k].decision)) errs.push(`yardsticks.${k}.decision must be one of ${DECISIONS.join(', ')}`);
+    if (y[k]?.reasons != null && !(Array.isArray(y[k].reasons) && y[k].reasons.length && y[k].reasons.every((r) => r.id && Array.isArray(r.any) && r.any.length)))
+      errs.push(`yardsticks.${k}.reasons must be [{ id, any: [phrases] }]`);
   }
   if (c.min_stage != null && !(Number.isInteger(c.min_stage) && c.min_stage >= 1 && c.min_stage <= (c.stages?.length || 0)))
     errs.push('min_stage must be a 1-based stage number');

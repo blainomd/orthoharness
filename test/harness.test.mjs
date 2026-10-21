@@ -135,3 +135,32 @@ test('refs flags a borrowed DOI and a dead one (positive control, CrossRef answe
   assert.deepEqual(s.rows.map((x) => x.verdict), ['VERIFIED', 'TITLE_MISMATCH', 'DOES_NOT_RESOLVE']);
   assert.equal(s.flagged, 2);
 });
+
+test('right for the wrong reason: same decision, none of the yardstick reasons named', async () => {
+  const c = cases.find((x) => x.id === 'demo-03-tka-skin-infection');
+  const at = (rationale) => async () => ({ decision: 'do_not_operate', rationale, contraindications_checked: ['active infection at the operative site'], citations: [] });
+  const wrong = await gradeCase(c, await runCase(c, at('BMI is high and she should lose weight before a knee replacement.')), loss, { offline: true });
+  const right = await gradeCase(c, await runCase(c, at('Draining wound with cellulitis over the knee. Treat the infection first.')), loss, { offline: true });
+  for (const k of ['guideline', 'attending']) {
+    assert.equal(wrong.yardsticks[k].agree, true);
+    assert.equal(wrong.yardsticks[k].wrong_reason, true);
+    assert.deepEqual(wrong.yardsticks[k].reasons_missed, ['active_infection']);
+    assert.equal(right.yardsticks[k].wrong_reason, false);
+    assert.deepEqual(right.yardsticks[k].reasons_named, ['active_infection']);
+  }
+  const s = summarize([wrong, right], { label: 't', adapter: 't', case_set_sha256: 'x', loss_matrix_version: 'v' });
+  assert.equal(s.yardsticks.attending.right_for_wrong_reason, 1);
+  assert.equal(s.yardsticks.attending.agreements_with_stated_reasons, 2);
+});
+
+test('a disagreeing answer is never counted as wrong-reason (it is just wrong)', async () => {
+  const c = cases.find((x) => x.id === 'demo-03-tka-skin-infection');
+  const r = await gradeCase(c, await runCase(c, async () => ({ decision: 'operate', rationale: 'Non-operative care failed.', citations: [] })), loss, { offline: true });
+  assert.equal(r.yardsticks.guideline.wrong_reason, false);
+});
+
+test('reasons must be [{ id, any }] when present', () => {
+  const bad = JSON.parse(JSON.stringify(cases[0]));
+  bad.yardsticks.guideline.reasons = [{ id: 'x' }];
+  assert.ok(validateCase(bad).some((e) => e.includes('reasons')));
+});

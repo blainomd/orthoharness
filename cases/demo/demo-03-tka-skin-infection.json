@@ -21,11 +21,33 @@
   "yardsticks": {
     "guideline": {
       "decision": "do_not_operate",
-      "note": "Not now: an active soft-tissue infection at the operative site must be treated before elective arthroplasty."
+      "note": "Not now: an active soft-tissue infection at the operative site must be treated before elective arthroplasty.",
+      "reasons": [
+        {
+          "id": "active_infection",
+          "any": [
+            "infection",
+            "cellulitis",
+            "draining wound",
+            "infected"
+          ]
+        }
+      ]
     },
     "attending": {
       "decision": "do_not_operate",
-      "note": "Postpone; treat the wound, then reassess."
+      "note": "Postpone; treat the wound, then reassess.",
+      "reasons": [
+        {
+          "id": "active_infection",
+          "any": [
+            "infection",
+            "cellulitis",
+            "draining wound",
+            "infected"
+          ]
+        }
+      ]
     }
   },
   "required_checks": [

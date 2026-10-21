@@ -94,7 +94,8 @@ One JSON file per case. See `cases/demo/` for seven complete examples.
   ],
   "yardsticks": {
     "guideline": { "decision": "do_not_operate", "note": "…" },
-    "attending": { "decision": "do_not_operate", "note": "…" }
+    "attending": { "decision": "do_not_operate", "note": "…",
+                   "reasons": [{ "id": "active_infection", "any": ["infection", "cellulitis"] }] }
   },
   "required_checks": [{ "id": "active_infection", "any": ["infection", "cellulitis", "wound"] }],
   "required_facts":  [{ "id": "failed_nonoperative", "any": ["failed", "despite"] }]
@@ -107,6 +108,11 @@ One JSON file per case. See `cases/demo/` for seven complete examples.
 - `required_checks` and `required_facts` match whole phrases in the answer. That is crude on
   purpose and easy to replace: a reader, or a second grader, can take its place. The point is that
   the route and the omissions are scored at all.
+- `reasons` (optional, per yardstick) names what that yardstick decided on. An answer that reaches
+  the same decision but whose rationale names none of the reasons is reported as **right for the
+  wrong reason**. A ticked contraindication list does not count: only the rationale is read, so an
+  answer that lists "infection" as checked and then argues from BMI is caught. A disagreeing answer
+  is never counted here; it is just wrong.
 
 ## Answer format
 

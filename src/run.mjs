@@ -26,9 +26,16 @@ export async function gradeCase(c, run, loss, opts = {}) {
   const yard = {};
   for (const k of ['guideline', 'attending']) {
     const truth = c.yardsticks[k].decision;
+    // The yardstick's deciding reasons, when the case names them. Agreeing while naming none of them
+    // is right for the wrong reason: approve/reject scoring cannot see it, and it is what breaks next.
+    const reasons = c.yardsticks[k].reasons ?? [];
+    const named = reasons.filter((r) => mentions(a.rationale ?? '', r.any)).map((r) => r.id);
     yard[k] = {
       truth,
       agree: valid && d === truth,
+      reasons_named: named,
+      reasons_missed: reasons.map((r) => r.id).filter((id) => !named.includes(id)),
+      wrong_reason: valid && d === truth && reasons.length > 0 && named.length === 0,
       loss: valid ? loss.loss[truth][d] : worst,
       over_commit: valid && truth === 'not_enough_information' && d !== truth,
       over_abstain: valid && truth !== 'not_enough_information' && d === 'not_enough_information',
@@ -55,13 +62,14 @@ export function summarize(results, meta) {
   const per = {};
   for (const k of ['guideline', 'attending']) {
     const confusion = Object.fromEntries(DECISIONS.map((t) => [t, Object.fromEntries([...DECISIONS, 'invalid'].map((p) => [p, 0]))]));
-    let agree = 0, lossSum = 0, oc = 0, oa = 0;
+    let agree = 0, lossSum = 0, oc = 0, oa = 0, wr = 0, withReasons = 0;
     for (const r of results) {
       const y = r.yardsticks[k];
       confusion[y.truth][r.valid ? r.decision : 'invalid']++;
       if (y.agree) agree++; lossSum += y.loss; if (y.over_commit) oc++; if (y.over_abstain) oa++;
+      if (y.wrong_reason) wr++; if (y.agree && (y.reasons_named.length || y.reasons_missed.length)) withReasons++;
     }
-    per[k] = { agree, of: n, decision_loss: round(lossSum), over_commit: oc, over_abstain: oa, confusion };
+    per[k] = { agree, of: n, decision_loss: round(lossSum), over_commit: oc, over_abstain: oa, right_for_wrong_reason: wr, agreements_with_stated_reasons: withReasons, confusion };
   }
   const split = results.filter((r) => r.yardsticks_disagree);
   const cites = results.flatMap((r) => r.citations);
