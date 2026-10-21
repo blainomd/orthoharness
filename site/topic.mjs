@@ -59,17 +59,24 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 // PubMed allows about 3 requests a second without a key. One request at a time, spaced.
 // A 429 waits and tries again (up to three times); any other failure stops the check.
+// One clock for every client, so the steps of one check (search, summaries, abstracts) never burst past
+// PubMed's three requests a second. In a browser a 429 arrives with no CORS header and looks like a
+// network failure, so a failed fetch is retried the same way a 429 is.
+let lastCall = 0;
 function client(fetchImpl = globalThis.fetch, gap = 400) {
-  let last = 0;
   return async (path, params) => {
     const u = `${EUTILS}/${path}?${new URLSearchParams({ db: 'pubmed', retmode: 'json', tool: 'orthoharness', ...params })}`;
     params = { retmode: 'json', ...params };
     for (let attempt = 0; ; attempt++) {
-      const wait = last + gap - Date.now();
+      const wait = lastCall + gap - Date.now();
       if (wait > 0) await sleep(wait);
-      last = Date.now();
-      const r = await fetchImpl(u);
-      if (r.status === 429 && attempt < 3) { await sleep(gap * 2 ** (attempt + 1)); continue; }
+      lastCall = Date.now();
+      let r;
+      try { r = await fetchImpl(u); } catch (e) {
+        if (attempt < 4) { await sleep(Math.max(gap, 500) * 2 ** attempt); continue; }
+        throw new Error(`PubMed did not answer after ${attempt + 1} tries (${e.message})`);
+      }
+      if (r.status === 429 && attempt < 4) { await sleep(Math.max(gap, 500) * 2 ** attempt); continue; }
       if (!r.ok) throw new Error(`PubMed answered ${r.status}`);
       return params.retmode === 'xml' ? r.text() : r.json();
     }
@@ -371,4 +378,48 @@ export function topicMarkdown(e, a = null) {
   }
   L.push('Levels come from PubMed publication types; the newest articles may not be typed yet. This is what exists, not what it shows: read the papers.', '');
   return L.join('\n');
+}
+
+// The sentence gate, shared by the CLI `ask` loop and the check page: one verdict per sentence of an answer.
+// Split into sentences without breaking inside a quotation or after "et al.".
+export function sentences(text) {
+  const out = [];
+  let cur = '', inQuote = false;
+  const s = String(text ?? '').replace(/\r/g, '');
+  for (let i = 0; i < s.length; i++) {
+    const ch = s[i];
+    cur += ch;
+    if (ch === '"') inQuote = !inQuote;
+    else if (ch === '“') inQuote = true;
+    else if (ch === '”') inQuote = false;
+    const next = s[i + 1];
+    const end = ch === '\n' || (!inQuote && /[.!?]/.test(ch) && (next === undefined || /\s/.test(next)) && !/\bet al\.$|\bvs\.$|\be\.g\.$|\bi\.e\.$/i.test(cur.trim()));
+    if (end) { if (cur.trim()) out.push(cur.trim()); cur = ''; if (ch === '\n') inQuote = false; }
+  }
+  if (cur.trim()) out.push(cur.trim());
+  return out.filter((x) => /[a-z]/i.test(x));
+}
+
+const ABSTAIN = /not enough information/i;
+
+// One verdict per sentence. KEPT needs: every cited record in the evidence, and at least one quote
+// found word for word in a cited paper's abstract. A sentence that only quotes titles is LISTED: it
+// names papers and makes no claim the gate can check. Anything else is struck or set aside.
+export function gateSentences(reply, check) {
+  return sentences(reply).map((text) => {
+    if (ABSTAIN.test(text)) return { text, verdict: 'ABSTAINED', reason: 'says the records do not answer it, which is a correct answer' };
+    const ids = extractIds(text);
+    const cites = check.cited.filter((c) => (c.record && (ids.pmids.includes(c.record.pmid) || (c.record.doi && ids.dois.includes(c.record.doi.toLowerCase()))))
+      || ids.pmids.includes(c.cited.replace(/^PMID /, '')) || ids.dois.includes(c.cited));
+    const quotes = check.quotes.filter((q) => text.includes(q.quote));
+    if (!cites.length && !quotes.length) return { text, verdict: 'UNCITED', reason: 'no citation: not shown as supported' };
+    const bad = cites.find((c) => c.verdict !== 'IN_EVIDENCE');
+    if (bad) return { text, verdict: 'STRUCK', reason: { REAL_OUTSIDE_SEARCH: 'cites a paper outside the retrieved records', NOT_IN_PUBMED: 'cites something not in PubMed', RETRACTED: 'cites a retracted paper' }[bad.verdict] ?? bad.verdict };
+    const misquote = quotes.find((q) => q.verdict === 'QUOTE_NOT_IN_ABSTRACT' || q.verdict === 'QUOTE_NO_SOURCE');
+    if (misquote) return { text, verdict: 'STRUCK', reason: misquote.verdict === 'QUOTE_NO_SOURCE' ? 'quote with no citation in the sentence' : 'quoted words are not in the cited abstract' };
+    const good = quotes.filter((q) => q.verdict === 'QUOTE_IN_SOURCE');
+    if (!good.length && quotes.length && quotes.every((q) => q.verdict === 'QUOTE_IS_TITLE')) return { text, verdict: 'LISTED', reason: 'quotes only a paper title: it names the paper and supports no claim' };
+    if (!good.length) return { text, verdict: 'STRUCK', reason: quotes.some((q) => q.verdict === 'QUOTE_NO_ABSTRACT') ? 'the cited paper has no abstract to check the quote against' : 'cites a real record but quotes nothing from it' };
+    return { text, verdict: 'KEPT', reason: 'cited record is in the evidence and the quoted words are in it', pmids: [...new Set(good.map((q) => q.record.pmid))] };
+  });
 }

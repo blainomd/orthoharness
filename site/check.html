@@ -126,13 +126,13 @@ h3{font:400 24px/1.25 var(--serif);margin:28px 0 6px}
 <section class="low"><div class="w">
   <p class="k">What this is, and is not</p>
   <p>It reads PubMed&apos;s public index: the JBJS family as PubMed lists it (The Journal of Bone &amp; Joint Surgery American and British volumes, JBJS Reviews, JBJS Open Access, JBJS Essential Surgical Techniques, JBJS Case Connector), about 38,000 articles. It shows titles and links, never full text or whole abstracts (one sentence only: a cited paper&apos;s own conclusion, when the proportion check flags it), and it does not summarize: it shows what exists, not what it proves. Levels come from PubMed publication types, and the newest articles may not be typed yet. A citation not found in PubMed is a reason to look, not a finding of fabrication.</p>
-  <p><strong>No AI writes anything on this page.</strong> Every title, year, journal and DOI is copied from the PubMed record; the counts are PubMed&apos;s counts; the verdicts and the &ldquo;runs out&rdquo; lines are fixed rules in open code. The one ranking not done by this code is the order of &ldquo;Most relevant&rdquo;, which is PubMed&apos;s own Best Match. Quotes are checked word for word against the paper&apos;s PubMed title and abstract (read to match, never shown), so an invented quote under a real citation is caught. What no rule can check: whether the quoted words mean what the answer says they mean. That still takes a person reading the paper.</p>
+  <p><strong>No AI writes anything on this page.</strong> Every title, year, journal and DOI is copied from the PubMed record; the counts are PubMed&apos;s counts; the verdicts and the &ldquo;runs out&rdquo; lines are fixed rules in open code. The one ranking not done by this code is the order of &ldquo;Most relevant&rdquo;, which is PubMed&apos;s own Best Match. Quotes are checked word for word against the paper&apos;s PubMed abstract (read to match, never shown here), so an invented quote under a real citation is caught; quoting a paper&apos;s own title names it and supports nothing. Each sentence of a pasted answer is then kept, listed, struck, uncited or abstained by fixed rules. The grounded prompt you copy carries the abstracts, so the AI can quote them. What no rule can check: whether the quoted words mean what the answer says they mean. That still takes a person reading the paper.</p>
   <p><strong>The proportion check.</strong> A quote can be word for word in the paper and still claim more than the paper shows, because an abstract&apos;s conclusion is often the sentence that outruns its own study (Billi, <a href="https://fbilli.substack.com" target="_blank" rel="noopener">The Claims We Don&apos;t Quite Make</a>, 2026). Each sentence of a pasted answer that cites a PMID or DOI is compared with that paper&apos;s design and abstract: cause claimed from a study that is not a trial; predicting or detecting with no accuracy figure reported; &ldquo;strongly&rdquo; where the abstract says modest; a stated limit dropped; and doubt pushed past the source (&ldquo;no evidence&rdquo; for a paper that reports a significant finding), because an AI that agrees with your skepticism amplifies it as easily as it amplifies a promise. The cited paper&apos;s own conclusion is checked the same way. It reads words, not meaning: a flag is a reason to read the paper, never a finding.</p>
   <p>The same check runs from the command line: <code>node bin/orthoharness.mjs topic "your question" --answer ai.txt</code>.</p>
 </div></section>
 <footer><div class="w"><p>orthoharness · Apache-2.0 · a reference implementation, not a validated benchmark · <a href="/">home</a></p></div></footer>
 <script type="module">
-import { checkTopic, checkAnswer, groundedPrompt, fetchAbstracts, PROPORTION_WORDS } from '/topic.mjs?v=b86ccb524428';
+import { checkTopic, checkAnswer, groundedPrompt, fetchAbstracts, PROPORTION_WORDS, gateSentences } from '/topic.mjs?v=89e202ac2107';
 const $ = (s) => document.querySelector(s);
 const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
 const VERDICT = { IN_EVIDENCE: 'In the evidence', REAL_OUTSIDE_SEARCH: 'Real, off this search', NOT_IN_PUBMED: 'Not in PubMed', RETRACTED: 'Retracted' };
@@ -200,6 +200,16 @@ $('#f').addEventListener('submit', async (ev) => {
       }
       if (a.unverifiable.length) ul.append(el('li', null, a.unverifiable.length + ' author-year mention(s) with no DOI or PMID, never counted as a pass: ' + a.unverifiable.join('; ')));
       out.append(ul);
+      const gs = gateSentences(answer, a);
+      if (gs.length) {
+        const GV = { KEPT: ['Kept', 'IN_EVIDENCE', 'cites a record in the evidence and quotes words that are in its abstract'], LISTED: ['Listed', 'REAL_OUTSIDE_SEARCH', 'quotes only a paper title: it names the paper, it supports nothing'], STRUCK: ['Struck', 'NOT_IN_PUBMED', ''], UNCITED: ['Uncited', 'REAL_OUTSIDE_SEARCH', 'no citation, so not shown as supported'], ABSTAINED: ['Abstained', 'IN_EVIDENCE', 'says the records do not answer it, which is a correct answer'] };
+        const n = (v) => gs.filter((g) => g.verdict === v).length;
+        out.append(el('h3', null, 'Sentence by sentence: ' + n('KEPT') + ' of ' + gs.length + ' kept'));
+        out.append(el('p', 'meta', 'A sentence is kept only when every record it cites is in the evidence above and it quotes words found in that record\u2019s abstract. Kept means checkable, not true: a person still reads whether the words mean what the sentence says.'));
+        const sl = el('ul');
+        for (const g of gs) { const v = GV[g.verdict]; const t = g.text.replace(/^[*\-\u2022\s]+/, '').replace(/\*\*/g, ''); const li = el('li'); li.append(el('span', 'v ' + v[1], v[0]), el('span', null, (t.length > 220 ? t.slice(0, 217) + '\u2026' : t) + ' '), el('span', 'meta', v[2] || g.reason)); sl.append(li); }
+        out.append(sl);
+      }
       out.append(el('h3', null, a.left_out.length ? 'Strong evidence the answer did not cite (' + a.left_out.length + ')' : 'It cites every guideline, meta-analysis and randomized trial shown above.'));
       if (a.left_out.length) out.append(list(a.left_out));
     }

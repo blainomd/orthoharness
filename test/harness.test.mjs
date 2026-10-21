@@ -441,3 +441,17 @@ test('proportion: checkAnswer reports claims and sources end to end', async () =
   assert.equal(a.counts.claims_flagged, 1);
   assert.match(topicMarkdown(e, a), /says it more strongly than the abstract/);
 });
+
+test('the check page runs the same sentence gate as the CLI (one function, browser-safe)', async () => {
+  const t = await import('../src/topic.mjs'); const a = await import('../src/ask.mjs');
+  assert.equal(t.gateSentences, a.gateSentences);
+  assert.ok(readFileSync(new URL('../site/check.html', import.meta.url), 'utf8').includes('gateSentences(answer, a)'));
+});
+
+test('topic: a browser-style network failure (a 429 with no CORS header) is retried like a 429', async () => {
+  let n = 0;
+  const f = async (u) => { if (++n === 1) throw new TypeError('Failed to fetch'); return pubmedStub({ count: 2 })(u); };
+  const e = await checkTopic('x', { fetch: f, gap: 0 });
+  assert.equal(e.total, 2);
+  assert.ok(n > 1);
+});
