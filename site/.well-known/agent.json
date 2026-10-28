@@ -6,6 +6,9 @@
   "code": "https://github.com/blainomd/orthoharness",
   "actions": [
     {
+      "id": "check_topic",
+      "label": "Check a topic, or an AI answer, against the JBJS journals as PubMed indexes them (in the browser)",
+      "url": "https://orthoharness.com/check",
       "name": "check_topic",
       "how": "https://orthoharness.com/check (browser), or git clone https://github.com/blainomd/orthoharness && node bin/orthoharness.mjs topic \"question\" [--answer ai.txt] [--scope jbjs|ortho|all] [--since YYYY]",
       "auth": "none",
@@ -14,6 +17,9 @@
       "safe_to_hand_to_user": true
     },
     {
+      "id": "run_benchmark",
+      "label": "Clone the harness and score a model or recorded answers on the demo cases",
+      "url": "https://orthoharness.com/#run",
       "name": "run_benchmark",
       "how": "git clone https://github.com/blainomd/orthoharness && node bin/orthoharness.mjs run cases/demo --adapter chat",
       "auth": "none",
@@ -21,6 +27,9 @@
       "safe_to_hand_to_user": true
     },
     {
+      "id": "screen_reference_list",
+      "label": "Screen a journal's reference list: every DOI looked up at CrossRef and its title compared",
+      "url": "https://orthoharness.com/#journals",
       "name": "screen_reference_list",
       "how": "git clone https://github.com/blainomd/orthoharness && node bin/orthoharness.mjs refs references.txt",
       "auth": "none",
@@ -46,5 +55,5 @@
     "citation_check": "https://github.com/blainomd/citecheck",
     "jbjs_evidence": "https://orthoharness.com/#jbjs"
   },
-  "updated": "2026-10-21"
+  "updated": "2026-10-28"
 }

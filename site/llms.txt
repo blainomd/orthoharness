@@ -46,5 +46,5 @@ Framing: a synthesis chooses which findings travel and goes quiet where the lite
 
 ## For AI agents
 READ: this file, then the README at https://github.com/blainomd/orthoharness
-ACT: clone the repo and run `npm test`; score a model with `--adapter chat` or recorded answers with `--adapter replay`.
+ACT: clone the repo and run `npm test`; score a model with `--adapter chat` or recorded answers with `--adapter replay` (the commands: https://orthoharness.com/#run). Check a topic or an AI answer in the browser: https://orthoharness.com/check. Screen a reference list: https://orthoharness.com/#journals.
 WORDS: a reference implementation, not a validated benchmark. Never describe a run on the demo cases as clinical validation. Never put patient information in a case, issue or pull request.
