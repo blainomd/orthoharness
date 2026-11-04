@@ -1,0 +1,27 @@
+{
+  "note": "orthoharness.com: the chrome every page wears, measured from the home on 2026-11-04 and held by estate-tests/design-drift.mjs --baseline design.json (the pre-push hook runs it). Edit this when the site's chrome changes on purpose; a page that differs is drift.",
+  "default": "site",
+  "pages": {},
+  "tiers": {
+    "site": {
+      "links": [
+        "orthoharness",
+        "Check a topic",
+        "The ten rows",
+        "Run it",
+        "For journals",
+        "Ask a vendor",
+        "Supported by",
+        "Who owns it",
+        "GitHub"
+      ],
+      "links_mobile": [
+        "orthoharness",
+        "GitHub"
+      ],
+      "h1": "Source Serif 4",
+      "body": "Inter",
+      "bg": "rgb(251, 250, 247)"
+    }
+  }
+}

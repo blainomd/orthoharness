@@ -1,0 +1,32 @@
+#!/bin/sh
+# pre-push: the design-drift gate (2026-10-05) with the signed waiver (2026-10-12).
+# Blaine, 10/4: "each site should carry one design from page to page". Before a push, every page of this checkout is rendered from disk (no live request) and held to the chrome declared in design.json (header links, type, background, at 1280 and 390 px); without a design.json, to the home page.
+# One drifting page refuses the push. If the shared scanner is missing the push is refused too, so a missing checker
+# never passes for a clean one.
+#   set up once per clone:  git config core.hooksPath .githooks
+#   when the gate fails:    it writes the failing lines as a request in .git/estate-waiver/. Blaine, in his own terminal:
+#                             ~/Documents/Projects/estate-tests/waiver.sh sign "<this clone>"
+#                           then pushes again; the gate re-runs and lets the push through only when his signature covers
+#                           exactly these findings on exactly this commit. DRIFT=skip was retired 2026-10-12: a bypass
+#                           that any shell could set proved nobody was there.
+set -u
+ET="$HOME/Documents/Projects/estate-tests"
+WAIVER="$ET/waiver.sh"
+cd "$(git rev-parse --show-toplevel)" || exit 1
+REPO="$(pwd)"
+if [ "${DRIFT:-}" = skip ]; then echo "pre-push: DRIFT=skip was retired 2026-10-12. The gate runs every time; if it fails, Blaine signs the request it writes: $WAIVER sign \"$REPO\""; exit 1; fi
+if [ ! -f "$ET/design-drift-gate.mjs" ]; then echo "pre-push: $ET/design-drift-gate.mjs is missing; refusing the push rather than skipping the check"; exit 1; fi
+if [ ! -x "$WAIVER" ]; then echo "pre-push: $WAIVER is missing; refusing the push (nothing could be waived, so nothing is trusted)"; exit 1; fi
+# The refs being pushed arrive on stdin (<local ref> <local sha> <remote ref> <remote sha>); a waiver binds one commit.
+SHA=""
+while read -r lref lsha rref rsha; do case "$rref" in refs/heads/main) SHA="$lsha";; *) [ -n "$SHA" ] || SHA="$lsha";; esac; done
+case "$SHA" in ""|0000000000000000000000000000000000000000) SHA="$(git rev-parse HEAD)";; esac
+LOG="$(mktemp -t drift-gate)"
+SCANLOG="$LOG"
+if node "$ET/design-drift-gate.mjs" --root site  $( [ -f design.json ] && echo --baseline design.json ) $( [ -f .design-drift.json ] && echo --known .design-drift.json ) >"$SCANLOG" 2>&1; then cat "$SCANLOG"; rm -f "$LOG"; exit 0; fi
+cat "$SCANLOG"
+echo "pre-push: a page does not wear the declared chrome (design.json) or the home chrome, or the scanner could not check (above); commit $SHA"
+"$WAIVER" request "$REPO" --gate pre-push --commit "$SHA" --log "$SCANLOG" --extra "step: a design check failed" || exit 1
+if "$WAIVER" verify "$REPO"; then echo "pre-push: the gate failed, and Blaine's signed waiver covers exactly these findings on this commit; pushing."; exit 0; fi
+echo "pre-push: refused. Fix the page, or have Blaine sign the request above in his own terminal, then push again."
+exit 1
