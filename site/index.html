@@ -3,22 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>orthoharness: an open benchmark harness for orthopaedic AI</title>
-<meta name="description" content="The models are good enough. The test is not. An open, Apache-2.0 harness that scores orthopaedic AI, and surgeons, the way surgeons actually decide: staged cases, two yardsticks, credit for not enough information, the keep-or-strike delta and a named signer.">
-<link rel="canonical" href="https://orthoharness.com/">
+<title>OrthoHarness now lives at decisionindex.com</title>
+<meta name="description" content="The orthopaedic AI check (a topic against JBJS, an AI answer's citations against PubMed) now lives at decisionindex.com/ortho. The OrthoHarness name and tool are available to acquire or license.">
+<link rel="canonical" href="https://decisionindex.com/ortho">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230a1220'/%3E%3Cpath d='M8 23 L16 8 L24 23 M11.5 17.5 H20.5' fill='none' stroke='%2310b981' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
-<meta property="og:title" content="orthoharness: the models are good enough. The test is not.">
-<meta property="og:description" content="An open benchmark harness for orthopaedic AI. Apache-2.0, no dependencies.">
+<meta property="og:title" content="OrthoHarness now lives at decisionindex.com">
+<meta property="og:description" content="Check an orthopaedic topic, or an AI's citations, against the published evidence: decisionindex.com/ortho.">
 <meta property="og:url" content="https://orthoharness.com/">
 <meta property="og:image" content="https://orthoharness.com/og.png">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta name="twitter:card" content="summary_large_image">
 <meta property="og:type" content="website">
 <meta name="theme-color" content="#0a1220">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600&family=Source+Serif+4:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareSourceCode","name":"orthoharness","description":"An open benchmark harness for orthopaedic AI: staged cases, two yardsticks never averaged, credit for not enough information, contraindication and omission checks, citation title checks, the keep-or-strike delta and a recorded signer.","codeRepository":"https://github.com/blainomd/orthoharness","license":"https://www.apache.org/licenses/LICENSE-2.0","programmingLanguage":"JavaScript","author":{"@type":"Person","name":"Blaine Warkentine, MD"}}</script>
 <style>
 :root{--bg:#0a1220;--low:#0d1729;--card:#111d33;--line:#1f2d45;--text:#eef2f8;--mute:#a7b3c6;--dim:#7d8aa0;--mint:#10b981;--mint2:#34d399;--amber:#f59e0b;--serif:"Source Serif 4",Georgia,serif;--mono:"JetBrains Mono",ui-monospace,monospace}
 @media (prefers-color-scheme: light){:root:not([data-theme="dark"]){--bg:#fbfaf7;--low:#f3f1ec;--card:#ffffff;--line:#e3ded4;--text:#141821;--mute:#4a5160;--dim:#6b7180;--mint:#047857;--mint2:#047857;--amber:#b45309}}
@@ -91,181 +87,24 @@ footer p{max-width:none}
 .sup span{display:block;font-size:14px;line-height:1.5;color:var(--mute)}
 @media (max-width:860px){.sup{grid-template-columns:1fr}}
 </style>
-<!-- estate-pwa v1 -->
-<link rel="manifest" href="/manifest.webmanifest">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="orthoharness">
-<script data-estate-pwa>if(typeof navigator!="undefined"&&"serviceWorker"in navigator)addEventListener("load",function(){navigator.serviceWorker.register("/sw.js").catch(function(){})})</script>
-<!-- /estate-pwa -->
+<style>.handoff{padding:96px 0}.handoff .btn.p{font-size:15px;min-height:56px;padding:0 28px}.handoff p.partner{margin-top:40px;font-size:15px;color:var(--dim)}</style>
 </head>
 <body>
 <header class="top"><div class="w">
   <a class="brand" href="/">orthoharness</a>
-  <nav class="nav" aria-label="Sections"><a href="/check">Check a topic</a><a href="#run">Run it</a><a href="https://github.com/blainomd/orthoharness">GitHub</a></nav>
+  <nav class="nav" aria-label="Sections"><a href="https://decisionindex.com/ortho">Check a topic</a><a href="https://github.com/blainomd/orthoharness#readme">Run it</a><a href="https://github.com/blainomd/orthoharness">GitHub</a></nav>
 </div></header>
-
 <main>
-<section>
-  <div class="w">
-    <div class="hero"><div>
-    <p class="k">An open benchmark harness for orthopaedic AI</p>
-    <h1>The models are good enough. <em>The test is not.</em></h1>
-    <p class="lead">A harness is everything around the model: what goes in, which tools it can use, what checks the output, how it is scored, and what gets recorded. orthoharness scores orthopaedic AI, and surgeons, the way surgeons actually decide. Apache-2.0, no dependencies, runs offline.</p>
-    <div class="btns">
-      <a class="btn p" href="/check" data-step="start">Check a topic in JBJS</a>
-      <a class="btn" href="https://github.com/blainomd/orthoharness" data-step="next">Get the code</a>
-      <a class="btn" href="https://surgeonvalue.com/docsf#harness" data-step="next">Why, with sources</a>
-    </div>
-    </div>
-    <figure class="hx" role="img" aria-label="The harness around the model: inputs, tools, checks, scoring, record">
-      <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><line x1="50" y1="50" x2="50" y2="14"/><line x1="50" y1="50" x2="84" y2="38"/><line x1="50" y1="50" x2="84" y2="72"/><line x1="50" y1="50" x2="50" y2="88"/><line x1="50" y1="50" x2="16" y2="55"/></svg>
-      <span class="m">model</span><span class="t" style="left:50%;top:14%">inputs</span><span class="t" style="left:84%;top:38%">tools</span><span class="t" style="left:84%;top:72%">checks</span><span class="t" style="left:50%;top:88%">scoring</span><span class="t" style="left:16%;top:55%">record</span>
-    </figure>
-    </div>
-    <p class="status"><b>Status:</b> a reference implementation, not a validated benchmark. Its seven demo cases are synthetic, written to exercise the harness, and are not clinical guidance. Its loss weights are placeholders that show the shape. The real cases and weights belong to the specialty.</p>
-  </div>
-</section>
-
-<section id="why">
-  <div class="w">
-    <p class="k">Why a harness</p>
-    <h2>Orthopaedics does not need its own model. <em>It needs its own harness.</em></h2>
-    <p>General-purpose models now beat specialized clinical tools on benchmarks (Vishwanath, Nature Medicine 2026). What decides whether one is safe in an orthopaedic clinic is everything around it, and a scorecard built for how surgeons actually decide.</p>
-    <p><b>Start with what goes in.</b> Asked for evidence with nothing to read from, a model fabricated 7.9% of 2,556 citations (McCavitt, JBJS OA 2026). Handed the source papers, models hallucinated in 0.08&ndash;6% of extractions, and leaving things out became the main error, 60&ndash;74% of the total (Shankar, J Biomed Inform 2026). Different tasks and models, so read it as direction, not rate: grounding the input removes most of the invention and moves the error to what is missing. A harness has to measure both.</p>
-  </div>
-</section>
-
-<section id="rows" class="low">
-  <div class="w">
-    <p class="k">The ten rows</p>
-    <h2>What today&apos;s tests miss, and what the harness does instead.</h2>
-    <ol class="rows">
-      <li class="rh" aria-hidden="true"><span></span><span>Today&apos;s tests</span><span>orthoharness</span></li>
-      <li class="r"><span class="n">1</span><p class="today">Fixed questions, asked once.</p><div><p class="fix">The record is revealed one stage at a time. Committing before the record supports it is scored as premature.</p><p class="src">Gong · JMIR 2025: 39 benchmarks, practice far below knowledge. AgentClinic · npj Digital Medicine 2026.</p></div></li>
-      <li class="r"><span class="n">2</span><p class="today">One yardstick, one score.</p><div><p class="fix">Two yardsticks, the guideline and the treating attending, scored apart and never averaged. Where they disagree, it shows which side the system took.</p><p class="src">Dagher · CORR 2024: 90 of 100 with the guideline, 78 with the attending.</p></div></li>
-      <li class="r"><span class="n">3</span><p class="today">Guessing pays.</p><div><p class="fix">&ldquo;Not enough information&rdquo; is a real answer with its own row in the loss matrix. A correct &ldquo;do not operate&rdquo; scores the same as a correct &ldquo;operate&rdquo;.</p><p class="src">CliniCARE-Bench · preprint: 16 of 16 systems over-committed.</p></div></li>
-      <li class="r"><span class="n">4</span><p class="today">Only the answer is graded.</p><div><p class="fix">The route is graded: each case lists the contraindication checks a safe answer must show.</p><p class="src">PLOS Medicine 2026: advice without a contraindication check is a process-safety failure.</p></div></li>
-      <li class="r"><span class="n">5</span><p class="today">A citation passes if it exists.</p><div><p class="fix">Every DOI is looked up at CrossRef and its title compared with the one given. Whether the paper supports the claim is counted as unread until a person reads it.</p><p class="src">McCavitt · JBJS OA 2026: 7.9% fabricated; about nine in ten real ones misattributed.</p></div></li>
-      <li class="r"><span class="n">6</span><p class="today">Only invented content counts.</p><div><p class="fix">Omissions count: each case lists the facts the reasoning has to name.</p><p class="src">Shankar · J Biomed Inform 2026: with the source supplied, omissions were 60–74% of errors.</p></div></li>
-      <li class="r"><span class="n">7</span><p class="today">Only the machine is measured.</p><div><p class="fix">The same grader scores a surgeon&apos;s own answers, so aided and unaided can be compared on the same cases.</p><p class="src">Budzyń · Lancet Gastroenterol Hepatol 2025: adenoma detection 28.4% before AI exposure, 22.4% after.</p></div></li>
-      <li class="r"><span class="n">8</span><p class="today">Written once, then stale.</p><div><p class="fix">The keep-or-strike delta turns a draft and a signed note into labeled kept, struck and added lines.</p><p class="src">The evidence a person looked, and new data from real practice.</p></div></li>
-      <li class="r"><span class="n">9</span><p class="today">Nobody owns the answer.</p><div><p class="fix">Every run records who signed. Without a signer, answers are reported as unsigned drafts. There is no single overall score.</p><p class="src">California AB 1979, signed Sep 30, 2026.</p></div></li>
-      <li class="r"><span class="n">10</span><p class="today">A right answer passes, whatever the reason.</p><div><p class="fix">A case can name the reasons each yardstick decided on. An answer that reaches the same decision but names none of them is reported as right for the wrong reason, a failure an agree-or-disagree score never sees.</p><p class="src">DeGrave · Nature Machine Intelligence 2021: chest X-ray models for COVID-19 selected shortcuts over the disease signal.</p></div></li>
-    </ol>
-    <p>Publish the loss matrix and weight each error by the harm it does: a missed infection is not an extra X-ray. Report results by kind of error, not as one leaderboard number. Withhold the test questions so no model trains on the exam.</p>
-  </div>
-</section>
-
-<section id="run">
-  <div class="w">
-    <p class="k">Run it</p>
-    <h2>Clone it, run the tests, score something.</h2>
-<pre>git clone https://github.com/blainomd/orthoharness &amp;&amp; cd orthoharness
-npm test        # 15 checks, offline
-
-node bin/orthoharness.mjs run cases/demo --adapter always-operate --offline
-node bin/orthoharness.mjs run cases/demo --adapter replay --answers examples/answers-careful.jsonl</pre>
-    <p>Any OpenAI-compatible endpoint, hosted or local. The key is read from the environment and never written to a run file:</p>
-<pre>ORTHOHARNESS_BASE_URL=http://localhost:11434/v1 ORTHOHARNESS_MODEL=llama3.1 \
-  node bin/orthoharness.mjs run cases/demo --adapter chat</pre>
-    <div class="grid">
-      <div class="c"><h3>Score a person</h3><p>The replay adapter reads a surgeon&apos;s own recorded answers and grades them by the same rules. <code>compare</code> puts aided and unaided side by side.</p></div>
-      <div class="c"><h3>Keep the delta</h3><p><code>delta draft.txt signed.txt</code> labels every kept, struck and added line. A note signed exactly as drafted is flagged: no evidence anyone edited it.</p></div>
-      <div class="c"><h3>Keep the exam private</h3><p><code>hash</code> gives a sha256 commitment to a case set. Publish the hash and the loss matrix; withhold the questions.</p></div>
-    </div>
-  </div>
-</section>
-
-<section id="journals" class="low">
-  <div class="w">
-    <p class="k">For journals and societies</p>
-    <h2>Screen the reference list <em>before peer review.</em></h2>
-    <p>An audit of about 2.5 million biomedical papers checked 97.1 million references and found 4,046 fabricated ones in 2,810 papers; at the time of the audit, 98.4% of the affected papers had received no publisher action (Topaz, Lancet 2026). In orthopaedics, 29 of 32 journals have an AI policy for authors, but only 48% of those policies say anything about AI-generated references (Kelly, JBJS OA 2026). The US Office of Research Integrity funded a 2026 project to measure the problem and build a tool that helps editors judge how much a fake citation affects a paper (ORI, FY2026 Research Integrity Awards).</p>
-<pre>node bin/orthoharness.mjs refs references.txt          # paste the list, one reference per line or block
-node bin/orthoharness.mjs refs references.txt --json   # exits 3 if any reference is flagged</pre>
-    <div class="grid">
-      <div class="c"><h3>What it does</h3><p>Looks up every DOI at CrossRef, one at a time, and compares the title CrossRef returns with the reference as written. A real DOI pasted under an invented title is flagged; so is a DOI that does not exist.</p></div>
-      <div class="c"><h3>What a flag means</h3><p>A reason for a person to look, not a finding of fabrication: a DOI can fail on a typo. References without a DOI are listed and never passed. It does not search by title.</p></div>
-      <div class="c"><h3>What it cannot tell you</h3><p>Whether the paper supports the sentence that cites it. The report counts that as unread. When someone reads, read past the abstract: only 12 of 201 orthopaedic abstracts named a limitation (Parisien, JBJS 2026).</p></div>
-    </div>
-  </div>
-</section>
-
-<section id="jbjs">
-  <div class="w">
-    <p class="k">What the journals published this year</p>
-    <h2>Seven 2026 papers from the JBJS journals, <em>and what each asks of a harness.</em></h2>
-    <div class="grid">
-      <div class="c"><h3>Accuracy is stage 1</h3><p>OSCAR proposes six stages from model development to monitored deployment; a technically strong model with no external validation stays at stage 1. The authors say the scale itself is unvalidated. A harness run is stage 1 evidence and moves nothing past it. Byrne · JBJS Reviews 2026.</p></div>
-      <div class="c"><h3>Reasoning from a document fails most</h3><p>Five retrieval systems answered 28 questions about three distal femoral replacement technique guides. None reached 50%; reasoned questions scored as low as 15.3%. Hence staged cases, and credit for &ldquo;not enough information&rdquo;. Woo · JBJS Open Access 2026.</p></div>
-      <div class="c"><h3>Abstracts drop the caveats</h3><p>Across 201 JBJS and CORR papers, Discussions carried 2.8 times the hedging of Abstracts, and 6.0% of Abstracts named a limitation. A model that reads abstracts learns the confident version. Parisien · JBJS 2026.</p></div>
-      <div class="c"><h3>Trials hide the data and code</h3><p>Eleven orthopaedic AI randomized trials met 81% of CONSORT-AI items on average, but one data-transparency item was reported by 9.1% and code access by 45.5%. Hence: publish the loss matrix and the case-set hash. Strasser · JBJS 2026.</p></div>
-      <div class="c"><h3>Reading a supplied note works</h3><p>On 719 hip replacement operative notes, prompted LLMs extracted approach, bearing and fixation at 96%, 89% and 96%, against 94%, 74% and 95% for rules-based NLP. Measured per field, against two human annotators. Yang · JBJS 2026.</p></div>
-      <div class="c"><h3>Score each language apart</h3><p>Simplifying 806 patient education documents, ChatGPT-4o matched people on English hallucinations but made more in Spanish; a later model closed the gap in an unblinded post hoc check. One pooled score would have hidden it. Nassar · JBJS 2026.</p></div>
-      <div class="c"><h3>A person stays in the loop</h3><p>A locally run multi-agent pipeline for spine systematic reviews agreed with dual human reviewers (kappa 0.87 to 0.98) and cut reviewer time by 91%; it was validated with a person in the loop, not run without one. Muthu · JBJS Open Access 2026.</p></div>
-    </div>
-  </div>
-</section>
-
-<section id="vendor" class="low">
-  <div class="w">
-    <p class="k">Before you buy</p>
-    <h2>Six questions for any AI vendor. <em>Including us.</em></h2>
-    <p>Scribes, coders, prior-auth and appeal agents are all selling to orthopaedic practices. Most publish an outcome they promise, not an error rate they measured. The harness, turned into questions:</p>
-    <div class="grid">
-      <div class="c"><h3><span class="qn">1</span> What is your error rate, against what reference, on which cases?</h3><p>A number measured against a named reference on a stated case mix. Knowledge scores run far above practice scores across 39 benchmarks (Gong, JMIR 2025), so ask for practice.</p></div>
-      <div class="c"><h3><span class="qn">2</span> Can it say “not enough information”, and how often does it?</h3><p>A system that never abstains is guessing on the incomplete records. All 16 systems scored with abstention over-committed (CliniCARE-Bench, preprint).</p></div>
-      <div class="c"><h3><span class="qn">3</span> What share of drafts do surgeons change before signing?</h3><p>“Signed without edits” is not a feature. It means there is no evidence anyone looked. Drafted histories carried erroneous information 36% of the time in a JAAOS trial.</p></div>
-      <div class="c"><h3><span class="qn">4</span> Does every citation in your letters say what the letter claims?</h3><p>Existing is not supporting: 7.9% fabricated and about nine in ten real citations misattributed (McCavitt, JBJS OA 2026). Ask who reads them before they go to a payer.</p></div>
-      <div class="c"><h3><span class="qn">5</span> Do you sell defensibility or uplift?</h3><p>A promised rise in code levels is what an audit looks for. Ask what happens to a claim when the documentation does not support it: does the tool say no?</p></div>
-      <div class="c"><h3><span class="qn">6</span> Will you run it through an open harness, and publish the result?</h3><p>Two yardsticks, staged cases, credit for abstaining, the delta, a named signer. This harness is open source; any vendor can run it.</p></div>
-    </div>
-    <p>Orthopaedics already ran this test on its last big technology. In 2026, three studies measured robotic knee replacement instead of trusting the brochure:</p>
-    <div class="grid">
-      <div class="c"><h3><span class="qn">A</span> RASKAL, a randomized trial</h3><p>Robotic-assisted surgery was not superior to computer-assisted surgery, and functional alignment was not superior to mechanical alignment, on KOOS-12 up to two years. MacDessi · Bone Joint J 2026.</p></div>
-      <div class="c"><h3><span class="qn">B</span> RACER-Knee, a randomized trial</h3><p>Robotic-arm-assisted knee replacement gave the same patient outcomes as conventional surgery, with longer operations at higher cost. Parsons · Lancet 2026.</p></div>
-      <div class="c"><h3><span class="qn">C</span> The UK registry, a target trial emulation</h3><p>Five-year implant survival after total knee replacement was 98.5% conventional and 98.6% robotic, with no difference in revision risk (HR 1.03). National Joint Registry data · BMJ 2026.</p></div>
-    </div>
-    <p>Nobody had to take a vendor&apos;s word for the robot. The same three questions apply to AI: a randomized comparison, a real-world registry, and a cost on the record.</p>
-    <p><b>The next test is patient-facing, and almost nobody is running it.</b> In the AMA&apos;s 2026 physician survey, 81% of physicians use AI professionally; the top patient-facing use, drafting replies to portal messages, is at 19% (AMA, 2026 Physician Survey on Augmented Intelligence). That is where the next wave of orthopaedic AI goes: explaining the operation and answering the questions the surgeon has no time for. The yardstick there is not how much the patient trusts the tool or the surgeon. At DOCSF 2026 a hand-surgery group reported that how much patients trusted their surgeon and what they actually knew about their condition did not move together (conference presentation, not yet published). So score what the patient knows afterwards, against the surgeon&apos;s own answers, on a stated set of questions, and publish the gap. The rule does not change with the audience: a measured error rate, a named reference, a stated case mix.</p>
-    <p>One more thing the harness scores on purpose. A synthesis chooses which findings travel and which uncertainties get dropped, and where the literature is thin it tends to go quiet rather than say so; a cited answer can still carry a frame nobody chose (Drazen and Haug, NEJM AI 2026, on medicine's shift from search to synthesis). So the harness gives credit for &ldquo;not enough information&rdquo; and scores an answer that names where the evidence runs out above one that fills the gap fluently.</p>
-  </div>
-</section>
-
-<section id="support">
-  <div class="w">
-    <p class="k">Open source, with support from</p>
-    <h2>Sites that point here, and hold themselves to it.</h2>
-    <p>Each of these links to the harness and states the rule it applies to its own work. None of them owns it.</p>
-    <div class="sup">
-      <a href="https://surgeonvalue.com/docsf#harness"><b>SurgeonValue</b><span>The why, every source, and six questions for any AI vendor. Including itself.</span></a>
-      <a href="https://clinicalswipe.com"><b>ClinicalSwipe</b><span>A signature proves who signed, not that anyone looked. Every decision carries a written reason.</span></a>
-      <a href="https://jointcoach.com"><b>JointCoach</b><span>Says what it measures and how sure it is: angles are estimates, with no measured error yet.</span></a>
-      <a href="https://jointclass.com"><b>JointClass</b><span>For patients: if your surgeon&apos;s office uses AI, ask who checks it, and who signs.</span></a>
-      <a href="https://www.mskvalue.com"><b>MSKValue</b><span>Measure, don&apos;t promise. Two yardsticks, never averaged. Outcomes never rank a surgeon.</span></a>
-      <a href="https://solvinghealth.com/build"><b>SolvingHealth</b><span>Lists the harness and citecheck with the estate&apos;s other open code.</span></a>
-    </div>
-  </div>
-</section>
-
-<section id="own" class="low">
-  <div class="w">
-    <p class="k">Who should own it</p>
-    <h2>Not a vendor. <em>Including us.</em></h2>
-    <p>The cases, the loss weights and the held-out test set belong with the specialty&apos;s own societies, journals and registries, versioned and independent. This is the plumbing: fork it, replace the demo cases, publish your loss matrix and your hash.</p>
-    <p>Contributions are welcome: synthetic cases, or properly de-identified ones with the right approvals (never patient information in an issue or pull request), graders that replace phrase matching, and adapters.</p>
-    <p class="pull">A promised outcome is marketing. A measured error is evidence.</p>
-  </div>
-</section>
+<section class="handoff"><div class="w">
+  <h1>OrthoHarness now lives at decisionindex.com.</h1>
+  <p class="lead">Check orthopaedic evidence and AI citations.</p>
+  <div class="btns"><a class="btn p" data-step="next" href="https://decisionindex.com/ortho">Go to decisionindex.com</a></div>
+  <p class="partner">For device and AI makers: the OrthoHarness name and tool are available to acquire or license. <a data-step="partner" href="https://solvinghealth.com/partners#orthoharness">See the offer</a></p>
+</div></section>
 </main>
-
 <footer><div class="w">
-  <p>orthoharness · Apache-2.0 · <a href="https://github.com/blainomd/orthoharness">github.com/blainomd/orthoharness</a> · sibling: <a href="https://github.com/blainomd/citecheck">citecheck</a> · sources: <a href="https://surgeonvalue.com/docsf#sources">surgeonvalue.com/docsf</a></p>
-  <p>Made by Blaine Warkentine, MD, for the DOCSF 2026 breakout on agentic search. For AI agents: <a href="/llms.txt">llms.txt</a> · <a href="/.well-known/agent.json">agent.json</a></p>
+  <p>orthoharness · Apache-2.0 · <a href="https://github.com/blainomd/orthoharness">github.com/blainomd/orthoharness</a> · For AI agents: <a href="/llms.txt">llms.txt</a> · <a href="/.well-known/agent.json">agent.json</a></p>
 </div></footer>
-<script>(function(){try{if(navigator.doNotTrack!=="1"&&!navigator.globalPrivacyControl&&!/bot|headless|lighthouse/i.test(navigator.userAgent)){var r="";try{r=document.referrer?new URL(document.referrer).hostname:""}catch(e){}navigator.sendBeacon("https://solvinghealth.com/api/arrive",JSON.stringify({p:location.pathname,r:r,m:matchMedia("(max-width:700px)").matches?1:0}))}}catch(e){}})()</script>
-<script data-estate-steps>/* estate-steps v1 (estate-tests/steps): count-only start/result/next, once each per page load; DNT/GPC/bots send nothing; nothing about the person is sent */(function(C){var S={},T=0;function go(s){try{if(S[s])return;if(navigator.doNotTrack==="1"||navigator.globalPrivacyControl||/bot|headless|lighthouse/i.test(navigator.userAgent))return;S[s]=1;navigator.sendBeacon("https://solvinghealth.com/api/arrive",JSON.stringify({s:s,p:location.pathname,m:matchMedia("(max-width:700px)").matches?1:0,t:(window.EstateAccount&&window.EstateAccount.token)||void 0}))}catch(e){}}function at(e,q){try{return q&&e.target&&e.target.closest?e.target.closest(q):null}catch(x){return null}}function vis(){try{if(!C.shown||!S.start)return;var n=document.querySelectorAll(C.shown);for(var i=0;i<n.length;i++){var r=n[i].getBoundingClientRect();if(r.width>0&&r.height>0&&getComputedStyle(n[i]).visibility!=="hidden"){go("result");return}}}catch(e){}}["click","change","submit"].forEach(function(t){document.addEventListener(t,function(e){if(t==="click"&&at(e,C.next)){go("next");return}if(at(e,C.start)){go("start");clearTimeout(T);T=setTimeout(vis,400)}},true)});if(C.shown&&typeof MutationObserver!=="undefined")new MutationObserver(function(){if(S.start&&!S.result){clearTimeout(T);T=setTimeout(vis,250)}}).observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:["class","hidden","style","open"]});try{if(C.page&&location.pathname.replace(/\.html$/,"").replace(/\/$/,"")===C.page.replace(/\/$/,"")&&document.referrer&&new URL(document.referrer).origin===location.origin)go("result")}catch(e){}})({"start":"[data-step=\"start\"]","shown":"","page":"","next":"[data-step=\"next\"]"})</script>
+<script>(function(){try{if(navigator.doNotTrack==="1"||navigator.globalPrivacyControl||/bot|headless|lighthouse/i.test(navigator.userAgent))return;var u="https://solvinghealth.com/api/arrive",m=matchMedia("(max-width:700px)").matches?1:0,r="";try{r=document.referrer?new URL(document.referrer).hostname:""}catch(e){}navigator.sendBeacon(u,JSON.stringify({p:location.pathname,r:r,m:m}));var S={};document.addEventListener("click",function(e){var a=e.target&&e.target.closest&&e.target.closest("[data-step]");if(!a)return;var s=a.getAttribute("data-step");if((s==="next"||s==="partner")&&!S[s]){S[s]=1;navigator.sendBeacon(u,JSON.stringify({s:s,p:location.pathname,m:m}))}},true)}catch(e){}})()</script>
 </body>
 </html>
