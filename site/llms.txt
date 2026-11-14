@@ -1,12 +1,12 @@
 # OrthoHarness (orthoharness.com)
 
-> OrthoHarness now lives at decisionindex.com. Its orthopaedic check (a topic against the JBJS journals by level of evidence, and an AI answer's DOIs, PMIDs and quotes against PubMed, by fixed rules, in the browser, nothing stored) is the orthopaedic set at https://decisionindex.com/ortho (draft until surgeons write and approve the key). The OrthoHarness name and tool are available to acquire or license (white-label) for orthopaedic device and AI makers validating their AI: https://solvinghealth.com/partners#orthoharness
+> For orthopaedic surgeons, researchers and device or AI teams: check an AI answer against the published orthopaedic evidence. Type a question and see every matching article across the JBJS journals by level of evidence (as PubMed indexes them); paste an AI answer and every DOI, PMID and quote is checked against PubMed by fixed rules, in the browser, with no AI judge and nothing stored. The check runs at https://decisionindex.com/ortho (a draft set until surgeons write and approve the key). This name and tool are available to acquire or license (non-exclusive) for orthopaedic device and AI makers: https://solvinghealth.com/partners#orthoharness
 
-## Now at
-- [go: check an orthopaedic topic or an AI's citations at decisionindex.com/ortho](https://decisionindex.com/ortho)
+## Check
+- [check: check an orthopaedic AI answer, or a topic, against the published evidence](https://decisionindex.com/ortho)
 
 ## Partners
-- [license: acquire or license the OrthoHarness name and tool](https://solvinghealth.com/partners#orthoharness)
+- [license: acquire or license the OrthoHarness name and tool (non-exclusive)](https://solvinghealth.com/partners#orthoharness)
 
 ## Code
-- The open harness stays on GitHub (Apache-2.0): https://github.com/blainomd/orthoharness
+- The open harness (Apache-2.0, no dependencies; a reference implementation, not a validated benchmark): https://github.com/blainomd/orthoharness
