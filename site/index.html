@@ -106,9 +106,9 @@ footer p{max-width:none}
     <h1>The models are good enough. <em>The test is not.</em></h1>
     <p class="lead">A harness is everything around the model: what goes in, which tools it can use, what checks the output, how it is scored, and what gets recorded. orthoharness scores orthopaedic AI, and surgeons, the way surgeons actually decide. Apache-2.0, no dependencies, runs offline.</p>
     <div class="btns">
-      <a class="btn p" href="/check">Check a topic in JBJS</a>
-      <a class="btn" href="https://github.com/blainomd/orthoharness">Get the code</a>
-      <a class="btn" href="https://surgeonvalue.com/docsf#harness">Why, with sources</a>
+      <a class="btn p" href="/check" data-step="start">Check a topic in JBJS</a>
+      <a class="btn" href="https://github.com/blainomd/orthoharness" data-step="next">Get the code</a>
+      <a class="btn" href="https://surgeonvalue.com/docsf#harness" data-step="next">Why, with sources</a>
     </div>
     </div>
     <figure class="hx" role="img" aria-label="The harness around the model: inputs, tools, checks, scoring, record">
@@ -258,5 +258,6 @@ node bin/orthoharness.mjs refs references.txt --json   # exits 3 if any referenc
   <p>Made by Blaine Warkentine, MD, for the DOCSF 2026 breakout on agentic search. For AI agents: <a href="/llms.txt">llms.txt</a> · <a href="/.well-known/agent.json">agent.json</a></p>
 </div></footer>
 <script>(function(){try{if(navigator.doNotTrack!=="1"&&!navigator.globalPrivacyControl&&!/bot|headless|lighthouse/i.test(navigator.userAgent)){var r="";try{r=document.referrer?new URL(document.referrer).hostname:""}catch(e){}navigator.sendBeacon("https://solvinghealth.com/api/arrive",JSON.stringify({p:location.pathname,r:r,m:matchMedia("(max-width:700px)").matches?1:0}))}}catch(e){}})()</script>
+<script data-estate-steps>/* estate-steps v1 (estate-tests/steps): count-only start/result/next, once each per page load; DNT/GPC/bots send nothing; nothing about the person is sent */(function(C){var S={},T=0;function go(s){try{if(S[s])return;if(navigator.doNotTrack==="1"||navigator.globalPrivacyControl||/bot|headless|lighthouse/i.test(navigator.userAgent))return;S[s]=1;navigator.sendBeacon("https://solvinghealth.com/api/arrive",JSON.stringify({s:s,p:location.pathname,m:matchMedia("(max-width:700px)").matches?1:0,t:(window.EstateAccount&&window.EstateAccount.token)||void 0}))}catch(e){}}function at(e,q){try{return q&&e.target&&e.target.closest?e.target.closest(q):null}catch(x){return null}}function vis(){try{if(!C.shown||!S.start)return;var n=document.querySelectorAll(C.shown);for(var i=0;i<n.length;i++){var r=n[i].getBoundingClientRect();if(r.width>0&&r.height>0&&getComputedStyle(n[i]).visibility!=="hidden"){go("result");return}}}catch(e){}}["click","change","submit"].forEach(function(t){document.addEventListener(t,function(e){if(t==="click"&&at(e,C.next)){go("next");return}if(at(e,C.start)){go("start");clearTimeout(T);T=setTimeout(vis,400)}},true)});if(C.shown&&typeof MutationObserver!=="undefined")new MutationObserver(function(){if(S.start&&!S.result){clearTimeout(T);T=setTimeout(vis,250)}}).observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:["class","hidden","style","open"]});try{if(C.page&&location.pathname.replace(/\.html$/,"").replace(/\/$/,"")===C.page.replace(/\/$/,"")&&document.referrer&&new URL(document.referrer).origin===location.origin)go("result")}catch(e){}})({"start":"[data-step=\"start\"]","shown":"","page":"","next":"[data-step=\"next\"]"})</script>
 </body>
 </html>
