@@ -91,6 +91,14 @@ footer p{max-width:none}
 .sup span{display:block;font-size:14px;line-height:1.5;color:var(--mute)}
 @media (max-width:860px){.sup{grid-template-columns:1fr}}
 </style>
+<!-- estate-pwa v1 -->
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="orthoharness">
+<script data-estate-pwa>if(typeof navigator!="undefined"&&"serviceWorker"in navigator)addEventListener("load",function(){navigator.serviceWorker.register("/sw.js").catch(function(){})})</script>
+<!-- /estate-pwa -->
 </head>
 <body>
 <header class="top"><div class="w">

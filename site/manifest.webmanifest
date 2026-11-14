@@ -1,0 +1,29 @@
+{
+  "name": "orthoharness",
+  "short_name": "orthoharness",
+  "description": "The models are good enough. The test is not. An open, Apache-2.0 harness that scores orthopaedic AI, and surgeons, the way surgeons actually decide: staged cases, two yardsticks, credit for not…",
+  "id": "/",
+  "scope": "/",
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#0A1220",
+  "background_color": "#FBFAF7",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
