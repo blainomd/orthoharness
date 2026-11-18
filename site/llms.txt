@@ -1,50 +1,12 @@
-# orthoharness
+# OrthoHarness (orthoharness.com)
 
-> An open benchmark harness for orthopaedic AI. Apache-2.0, Node 18+, no dependencies. A reference implementation, not a validated benchmark: its seven demo cases are synthetic and its loss weights are placeholders.
+> For orthopaedic surgeons, researchers and device or AI teams: check an AI answer against the published orthopaedic evidence. Type a question and see every matching article across the JBJS journals by level of evidence (as PubMed indexes them); paste an AI answer and every DOI, PMID and quote is checked against PubMed by fixed rules, in the browser, with no AI judge and nothing stored. The check runs at https://decisionindex.com/ortho (a draft set until surgeons write and approve the key). This name and tool are available to acquire or license (non-exclusive) for orthopaedic device and AI makers: https://solvinghealth.com/partners#orthoharness
 
-Code: https://github.com/blainomd/orthoharness
-Why, with sources: https://surgeonvalue.com/docsf#harness
-Sibling: https://github.com/blainomd/citecheck (title-checking citation tool)
+## Check
+- [check: check an orthopaedic AI answer, or a topic, against the published evidence](https://decisionindex.com/ortho)
 
-## What it scores
-- Staged cases: the record is revealed one stage at a time; committing before the record supports it is premature.
-- Two yardsticks, guideline and treating attending, scored apart and never averaged.
-- "not_enough_information" is a real answer; a correct do-not-operate scores the same as a correct operate.
-- Required contraindication checks and required facts (omissions) per case.
-- Right for the wrong reason: a case can name each yardstick's deciding reasons; an answer that matches the decision but names none of them is reported separately (shortcut learning: DeGrave, Nature Machine Intelligence 2021).
-- Citations: DOI looked up at CrossRef and title compared; support for the claim is not machine-checked.
-- The keep-or-strike delta between a draft and a signed note; a recorded signer; no single overall score.
-- A sha256 commitment to a private test set.
-- A reference-list screen for journals (`refs`).
+## Partners
+- [license: acquire or license the OrthoHarness name and tool (non-exclusive)](https://solvinghealth.com/partners#orthoharness)
 
-## For surgeons: check a topic against JBJS (https://orthoharness.com/check)
-Type a question; see every matching article across the JBJS journals as PubMed indexes them (JBJS Am and Br, JBJS Reviews, JBJS Open Access, JBJS Essential Surgical Techniques, JBJS Case Connector; about 38,000 articles), counted by level (guideline, meta-analysis or systematic review, randomized trial, other trial), newest first, with a line saying where the evidence runs out. Paste an AI answer and every DOI and PMID in it is checked against the same record: in the evidence, real but outside this search, not in PubMed (a reason to look, not a finding of fabrication), or retracted; author-year mentions with no identifier are listed and never passed; the guidelines, meta-analyses and trials it did not cite are listed. No model runs anywhere in it: titles, years, journals and DOIs are copied from PubMed records, counts are PubMed's, verdicts are fixed rules; only the 'Most relevant' order is PubMed's Best Match ranking. Quotes in an answer (in double quotes, with a PMID or DOI in the same sentence) are matched word for word against that paper's PubMed abstract: found, title only (quoting a paper's title names it and supports nothing), not in the abstract (may be in the full text), no abstract, or no source. A grounded prompt (cite only these records, each listed with its PubMed abstract; quote each claim's words from the abstract; 'not enough information' is a correct answer) is offered to copy into any AI (CLI: --prompt). CLI `ask` runs the loop with any OpenAI-compatible model: retrieve, constrain, gate every sentence (kept, listed, struck, uncited, abstained), and write a receipt with sha256 of the prompt and reply; an empty, cut-off or context-truncated reply is an error. Proportion check (2026-10-21): each cited sentence is compared with its paper's design and abstract and flagged when it claims cause from a non-trial, predicts or detects with no accuracy reported (AUC, sensitivity, specificity), says 'strongly' where the abstract says modest, drops a limit the abstract states, or doubts past a source that reports a significant finding; the paper's own conclusion is checked the same way (the sentence that travels; after Billi, 'The Claims We Don't Quite Make', 2026). Word rules, not a reading: a flag is a reason to read the paper. No rule checks whether quoted words mean what the answer says. Runs in the browser straight to PubMed; nothing is stored. The page shows titles and links only; the copied prompt carries the abstracts so the AI can quote them. Levels come from PubMed publication types; trial summaries and commentaries may not be typed. CLI: `node bin/orthoharness.mjs topic "question" --answer ai.txt` (`--scope jbjs|ortho|all`, `--since YYYY`).
-
-## For journals: screen a reference list (https://orthoharness.com/#journals)
-`node bin/orthoharness.mjs refs references.txt` looks up every DOI at CrossRef and compares the returned title with the reference as written; it flags a borrowed or dead DOI, lists references without a DOI, never passes them, does not search by title, and does not check support. Exits 3 if anything is flagged. A flag is a reason to look, not a finding of fabrication.
-Why: 4,046 fabricated references in 2,810 of ~2.5M papers, 98.4% with no publisher action at audit (Topaz, Lancet 2026, doi 10.1016/S0140-6736(26)00603-3); 48% of orthopaedic journal AI policies address AI-generated references (Kelly, JBJS OA 2026, doi 10.2106/JBJS.OA.26.00221).
-
-## 2026 JBJS-journal evidence the harness answers (https://orthoharness.com/#jbjs)
-- OSCAR readiness scale, six stages; accuracy alone = stage 1; scale unvalidated (Byrne, JBJS Rev 2026, doi 10.2106/JBJS.RVW.26.00182). A harness run is stage 1 evidence.
-- LLM retrieval on implant technique guides: all five systems <50%, reasoned questions as low as 15.3% (Woo, JBJS OA 2026, doi 10.2106/JBJS.OA.26.00076).
-- Abstracts vs Discussions in 201 JBJS/CORR papers: 2.8x hedging in Discussions; 6.0% of Abstracts name a limitation (Parisien, JBJS 2026, doi 10.2106/JBJS.26.00433).
-- CONSORT-AI in 11 orthopaedic AI RCTs: 81% of items on average; one data-transparency item 9.1%, code access 45.5% (Strasser, JBJS 2026, doi 10.2106/JBJS.25.01439).
-- LLM vs rules NLP on 719 THA op notes: 96/89/96% vs 94/74/95% (Yang, JBJS 2026, doi 10.2106/JBJS.25.01338).
-- ChatGPT simplification of 806 patient education documents: more Spanish hallucinations than people with GPT-4o; gap closed in an unblinded post hoc GPT-5 check (Nassar, JBJS 2026, doi 10.2106/JBJS.25.00982).
-- Local multi-agent spine systematic review pipeline: kappa 0.87-0.98 vs dual human reviewers, 91% less reviewer time, human in the loop (Muthu, JBJS OA 2026, doi 10.2106/JBJS.OA.26.00102).
-
-## Six questions for any AI vendor (https://orthoharness.com/#vendor)
-1. What is your error rate, against what reference, on which cases?
-2. Can it say "not enough information", and how often does it?
-3. What share of drafts do surgeons change before signing?
-4. Does every citation say what the letter claims?
-5. Do you sell defensibility or uplift?
-6. Will you run it through an open harness, and publish the result?
-Precedent: in 2026, robotic knee replacement was measured, not trusted. RASKAL (Bone Joint J 2026) and RACER-Knee (Lancet 2026) found no outcome advantage; the UK National Joint Registry target trial emulation (BMJ 2026) found no difference in five-year revision risk.
-Next test, patient-facing AI: AMA 2026 physician survey, 81% of physicians use AI professionally and the top patient-facing use (drafting portal replies) is 19%. Score what the patient knows afterwards against the surgeon's own answers on a stated question set; trust is not the yardstick (a DOCSF 2026 hand-surgery presentation found trust and knowledge did not move together; not yet published).
-Framing: a synthesis chooses which findings travel and goes quiet where the literature is thin; a cited answer can still carry a frame nobody chose (Drazen and Haug, NEJM AI 2026, doi 10.1056/AIe2600526). The harness therefore credits "not enough information" and scores an answer that names where the evidence runs out above one that fills the gap.
-
-## For AI agents
-READ: this file, then the README at https://github.com/blainomd/orthoharness
-ACT: clone the repo and run `npm test`; score a model with `--adapter chat` or recorded answers with `--adapter replay` (the commands: https://orthoharness.com/#run). Check a topic or an AI answer in the browser: https://orthoharness.com/check. Screen a reference list: https://orthoharness.com/#journals.
-WORDS: a reference implementation, not a validated benchmark. Never describe a run on the demo cases as clinical validation. Never put patient information in a case, issue or pull request.
+## Code
+- The open harness (Apache-2.0, no dependencies; a reference implementation, not a validated benchmark): https://github.com/blainomd/orthoharness
