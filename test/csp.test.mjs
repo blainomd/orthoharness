@@ -100,3 +100,11 @@ test('a link can carry a topic: ?q fills the form and runs the check; the copy b
   assert.ok(!/history\.(push|replace)State/.test(js), 'never rewrites the address on its own');
   assert.match(js, /slice\(0, 300\)/, 'topic capped at the field length');
 });
+
+test('the home offers checks already run: three topic links to /check?q=, before the licence offer', () => {
+  const home = pages[0];
+  const links = [...home.matchAll(/href="(\/check\?q=[^"]+)"/g)].map((m) => m[1]);
+  assert.ok(links.length >= 3, 'at least three topic links');
+  for (const l of links) assert.match(l, /^\/check\?q=[a-z0-9+\-]+$/, 'a plain topic, nothing else in the link');
+  assert.ok(home.indexOf('/check?q=') < home.indexOf('data-step="partner"'), 'the job comes before the offer');
+});
