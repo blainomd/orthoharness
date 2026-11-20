@@ -28,7 +28,7 @@
           },
           {
             "key": "Content-Security-Policy",
-            "value": "default-src 'self'; script-src 'self' 'sha256-FtZ9DBcKuMDdd32DgX29rvWzWrtmxAZSrfcuKlqmMiE=' 'sha256-N6Lu/4GW7uFnT19aKE/2YFHgSMHxhbpdXkqiJeN1Ls0=' 'sha256-kNEBV+I4d0EpQkx+ZxP//H4pdmgqhR8kVETW0ynMVFE=' 'sha256-sjsKvIDg1WykCzyd2q6frMVGUZmZADt1+iyrBz69DNA='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://eutils.ncbi.nlm.nih.gov https://solvinghealth.com; manifest-src 'self'; worker-src 'self'; frame-ancestors 'self'; form-action 'self'; base-uri 'self'; object-src 'none'"
+            "value": "default-src 'self'; script-src 'self' 'sha256-FtZ9DBcKuMDdd32DgX29rvWzWrtmxAZSrfcuKlqmMiE=' 'sha256-N6Lu/4GW7uFnT19aKE/2YFHgSMHxhbpdXkqiJeN1Ls0=' 'sha256-kNEBV+I4d0EpQkx+ZxP//H4pdmgqhR8kVETW0ynMVFE=' 'sha256-iUWRJMkhNg8U8pHBPok4HMAEsTS25k+x1qc+WmpxXYk='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://eutils.ncbi.nlm.nih.gov https://solvinghealth.com; manifest-src 'self'; worker-src 'self'; frame-ancestors 'self'; form-action 'self'; base-uri 'self'; object-src 'none'"
           },
           {
             "key": "Permissions-Policy",

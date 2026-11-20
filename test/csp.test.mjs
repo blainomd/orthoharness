@@ -69,3 +69,19 @@ test('print keeps only the result: every other part of the page is hidden in pri
   assert.match(m[1], /body > :not\(section:has\(#out\)\)/, 'every top-level part except the result section');
   assert.match(m[1], /section:has\(#out\) \.w > :not\(#out\)/, 'inside it, everything except #out (title, lead, form, Done block)');
 });
+
+test('the check counts its job: start on submit, result when the answer shows, next on the optional link; never what was typed', () => {
+  const check = pages[1];
+  assert.match(check, /<script src="\/steps\.js" defer><\/script>/, 'check.html loads /steps.js');
+  const js = readFileSync(new URL('../site/steps.js', import.meta.url), 'utf8');
+  assert.match(js, /getElementById\('f'\)[\s\S]*addEventListener\('submit'/, 'start on the form submit');
+  assert.match(js, /step\("start"\)/, 'sends start');
+  assert.match(js, /MutationObserver[\s\S]*#out h2|querySelector\('#out h2'\)/, 'result when an h2 lands in #out');
+  assert.match(js, /step\("result"\)/, 'sends result');
+  assert.match(js, /data-step/, 'next from the data-step link');
+  assert.ok(!/\.value|textContent|innerText|FormData/.test(js), 'never reads what was typed or shown');
+  assert.match(js, /doNotTrack|globalPrivacyControl/, 'honours DNT and GPC');
+  assert.ok(/connect-src[^;]*https:\/\/solvinghealth\.com/.test(csp), 'the counter host is allowed');
+  // One check, one start: the home button only opens /check, so the home counts next and partner clicks, not start.
+  assert.ok(!/s==="start"/.test(pages[0]), 'home does not count start');
+});
