@@ -52,3 +52,13 @@ test('own two feet: no link on the home page leaves for decisionindex.com (the h
 test('the sitemap lists the check page', () => {
   assert.match(readFileSync(new URL('../site/sitemap.xml', import.meta.url), 'utf8'), /<loc>https:\/\/orthoharness\.com\/check<\/loc>/);
 });
+
+test('own two feet: after a result, /check says Done and offers Print (shown only when a result is on the page)', () => {
+  const check = pages[1];
+  assert.match(check, /<div class="after"[^>]*>\s*<h2>Done\.<\/h2>/, 'a Done heading after the result');
+  assert.match(check, /<button[^>]*id="print"/, 'a Print button');
+  assert.match(check, /<script src="\/print\.js"( defer)?><\/script>/, 'print wired from a first-party file, not an inline handler');
+  assert.match(readFileSync(new URL('../site/print.js', import.meta.url), 'utf8'), /addEventListener\('click'[\s\S]*print\(\)/);
+  assert.match(check, /\.after\{display:none\}/, 'hidden before a result');
+  assert.match(check, /#out:has\(h2\)\s*\+\s*\.after\{display:block\}/, 'shown once a result heading is in #out');
+});
