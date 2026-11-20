@@ -62,3 +62,10 @@ test('own two feet: after a result, /check says Done and offers Print (shown onl
   assert.match(check, /\.after\{display:none\}/, 'hidden before a result');
   assert.match(check, /#out:has\(h2\)\s*\+\s*\.after\{display:block\}/, 'shown once a result heading is in #out');
 });
+
+test('print keeps only the result: every other part of the page is hidden in print', () => {
+  const m = pages[1].match(/@media print\{([^@]*?)\}\s*(?:\n|<\/style>)/);
+  assert.ok(m, 'a print block');
+  assert.match(m[1], /body > :not\(section:has\(#out\)\)/, 'every top-level part except the result section');
+  assert.match(m[1], /section:has\(#out\) \.w > :not\(#out\)/, 'inside it, everything except #out (title, lead, form, Done block)');
+});
