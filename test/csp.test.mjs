@@ -44,3 +44,11 @@ test('own two feet: the door starts the job on this site, and the sibling link c
   const out = check.indexOf('id="out"'), sib = check.indexOf('https://decisionindex.com/ortho');
   assert.ok(out > 0 && sib > out, 'the decisionindex link sits after the result');
 });
+
+test('own two feet: no link on the home page leaves for decisionindex.com (the header nav included)', () => {
+  assert.ok(!/href="https:\/\/decisionindex\.com/.test(pages[0]), 'the home links to /check, never off-site for the job');
+});
+
+test('the sitemap lists the check page', () => {
+  assert.match(readFileSync(new URL('../site/sitemap.xml', import.meta.url), 'utf8'), /<loc>https:\/\/orthoharness\.com\/check<\/loc>/);
+});
