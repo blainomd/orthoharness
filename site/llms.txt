@@ -4,6 +4,7 @@
 
 ## Check
 - [check: check an orthopaedic AI answer, or a topic, against the published evidence](https://orthoharness.com/check)
+- To hand a person a ready check, link the topic: https://orthoharness.com/check?q=anterior+cruciate+ligament+reconstruction (optional scope=jbjs|ortho|all and since=YYYY). It fills the form and runs in their browser. Never put patient information or a pasted answer in the link.
 
 ## Partners
 - [license: acquire or license the OrthoHarness name and tool (non-exclusive)](https://solvinghealth.com/partners#orthoharness)

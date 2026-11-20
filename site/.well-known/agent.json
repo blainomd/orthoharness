@@ -2,7 +2,7 @@
   "schema": "https://solvinghealth.com/schemas/agent-manifest-v1",
   "name": "OrthoHarness",
   "url": "https://orthoharness.com",
-  "updated": "2026-11-14",
+  "updated": "2026-11-20",
   "summary": "For orthopaedic surgeons, researchers and device or AI teams: check an AI answer against the published orthopaedic evidence. A topic is counted across the JBJS journals by level of evidence; an AI answer's DOIs, PMIDs and quotes are checked against PubMed by fixed rules, in the browser, with no AI judge and nothing stored. The check runs at orthoharness.com/check and also at decisionindex.com/ortho (draft until surgeons approve the key). This name and tool are available to acquire or license (non-exclusive) for orthopaedic device and AI makers.",
   "audience": ["orthopaedic-surgeon", "researcher", "device-maker", "ai-developer"],
   "publisher": { "name": "SolvingHealth", "url": "https://solvinghealth.com" },
@@ -14,7 +14,9 @@
       "url": "https://orthoharness.com/check",
       "auth": "none",
       "uploads_data": false,
-      "safe_to_hand_to_user": true
+      "safe_to_hand_to_user": true,
+      "url_template": "https://orthoharness.com/check?q={topic}&scope={jbjs|ortho|all}&since={YYYY}",
+      "params": { "q": "topic words, up to 300 characters, no patient information", "scope": "optional: jbjs (default), ortho or all", "since": "optional four-digit year" }
     },
     {
       "id": "license",
