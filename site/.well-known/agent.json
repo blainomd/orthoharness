@@ -3,7 +3,7 @@
   "name": "OrthoHarness",
   "url": "https://orthoharness.com",
   "updated": "2026-11-14",
-  "summary": "For orthopaedic surgeons, researchers and device or AI teams: check an AI answer against the published orthopaedic evidence. A topic is counted across the JBJS journals by level of evidence; an AI answer's DOIs, PMIDs and quotes are checked against PubMed by fixed rules, in the browser, with no AI judge and nothing stored. The check runs at decisionindex.com/ortho (draft until surgeons approve the key). This name and tool are available to acquire or license (non-exclusive) for orthopaedic device and AI makers.",
+  "summary": "For orthopaedic surgeons, researchers and device or AI teams: check an AI answer against the published orthopaedic evidence. A topic is counted across the JBJS journals by level of evidence; an AI answer's DOIs, PMIDs and quotes are checked against PubMed by fixed rules, in the browser, with no AI judge and nothing stored. The check runs at orthoharness.com/check and also at decisionindex.com/ortho (draft until surgeons approve the key). This name and tool are available to acquire or license (non-exclusive) for orthopaedic device and AI makers.",
   "audience": ["orthopaedic-surgeon", "researcher", "device-maker", "ai-developer"],
   "publisher": { "name": "SolvingHealth", "url": "https://solvinghealth.com" },
   "code": "https://github.com/blainomd/orthoharness",
@@ -11,7 +11,7 @@
     {
       "id": "check",
       "label": "Check an orthopaedic AI answer, or a topic, against the published evidence (JBJS by level of evidence; citations and quotes against PubMed; runs in the browser; nothing stored)",
-      "url": "https://decisionindex.com/ortho",
+      "url": "https://orthoharness.com/check",
       "auth": "none",
       "uploads_data": false,
       "safe_to_hand_to_user": true

@@ -1,9 +1,9 @@
 # OrthoHarness (orthoharness.com)
 
-> For orthopaedic surgeons, researchers and device or AI teams: check an AI answer against the published orthopaedic evidence. Type a question and see every matching article across the JBJS journals by level of evidence (as PubMed indexes them); paste an AI answer and every DOI, PMID and quote is checked against PubMed by fixed rules, in the browser, with no AI judge and nothing stored. The check runs at https://decisionindex.com/ortho (a draft set until surgeons write and approve the key). This name and tool are available to acquire or license (non-exclusive) for orthopaedic device and AI makers: https://solvinghealth.com/partners#orthoharness
+> For orthopaedic surgeons, researchers and device or AI teams: check an AI answer against the published orthopaedic evidence. Type a question and see every matching article across the JBJS journals by level of evidence (as PubMed indexes them); paste an AI answer and every DOI, PMID and quote is checked against PubMed by fixed rules, in the browser, with no AI judge and nothing stored. The check runs here at https://orthoharness.com/check and also at https://decisionindex.com/ortho (a draft set until surgeons write and approve the key). This name and tool are available to acquire or license (non-exclusive) for orthopaedic device and AI makers: https://solvinghealth.com/partners#orthoharness
 
 ## Check
-- [check: check an orthopaedic AI answer, or a topic, against the published evidence](https://decisionindex.com/ortho)
+- [check: check an orthopaedic AI answer, or a topic, against the published evidence](https://orthoharness.com/check)
 
 ## Partners
 - [license: acquire or license the OrthoHarness name and tool (non-exclusive)](https://solvinghealth.com/partners#orthoharness)
