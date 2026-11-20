@@ -28,7 +28,7 @@
           },
           {
             "key": "Content-Security-Policy",
-            "value": "default-src 'self'; script-src 'self' 'sha256-FtZ9DBcKuMDdd32DgX29rvWzWrtmxAZSrfcuKlqmMiE=' 'sha256-kNEBV+I4d0EpQkx+ZxP//H4pdmgqhR8kVETW0ynMVFE='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://eutils.ncbi.nlm.nih.gov; manifest-src 'self'; worker-src 'self'; frame-ancestors 'self'; form-action 'self'; base-uri 'self'; object-src 'none'"
+            "value": "default-src 'self'; script-src 'self' 'sha256-FtZ9DBcKuMDdd32DgX29rvWzWrtmxAZSrfcuKlqmMiE=' 'sha256-N7VLnVLjz86jDevGx+8aKtTPN+JSfHSdKwZRa2RPGBk=' 'sha256-kNEBV+I4d0EpQkx+ZxP//H4pdmgqhR8kVETW0ynMVFE='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://eutils.ncbi.nlm.nih.gov; manifest-src 'self'; worker-src 'self'; frame-ancestors 'self'; form-action 'self'; base-uri 'self'; object-src 'none'"
           },
           {
             "key": "Permissions-Policy",
