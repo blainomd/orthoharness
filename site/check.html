@@ -142,7 +142,7 @@ h3{font:400 24px/1.25 var(--serif);margin:28px 0 6px}
   <div class="after">
     <h2>Done.</h2>
     <p>You now have the matching JBJS articles by level of evidence, and, if you pasted an answer, every citation and quote checked against PubMed. Print it or save it as a PDF to keep or bring to a journal club; nothing was stored here.</p>
-    <div class="btns"><button type="button" class="btn p" id="print">Print or save as PDF</button></div>
+    <div class="btns"><button type="button" class="btn p" id="print">Print or save as PDF</button><button type="button" class="btn" id="share">Copy a link to this topic</button></div>
     <p class="opt">Optional next step: the same check sits beside the other DecisionIndex tests at <a data-step="next" href="https://decisionindex.com/ortho">decisionindex.com/ortho</a>.</p>
   </div>
 </div></section>
@@ -243,5 +243,6 @@ $('#f').addEventListener('submit', async (ev) => {
 </script>
 <script src="/print.js" defer></script>
 <script src="/steps.js" defer></script>
+<script src="/link.js" defer></script>
 </body>
 </html>

@@ -85,3 +85,18 @@ test('the check counts its job: start on submit, result when the answer shows, n
   // One check, one start: the home button only opens /check, so the home counts next and partner clicks, not start.
   assert.ok(!/s==="start"/.test(pages[0]), 'home does not count start');
 });
+
+test('a link can carry a topic: ?q fills the form and runs the check; the copy button shares topic and scope only, never a pasted answer', () => {
+  const check = pages[1];
+  assert.match(check, /<script src="\/link\.js" defer><\/script>/, 'check.html loads /link.js');
+  assert.match(check, /id="share"/, 'Done block has a copy-link button');
+  const js = readFileSync(new URL('../site/link.js', import.meta.url), 'utf8');
+  assert.match(js, /URLSearchParams\(location\.search\)/, 'reads the address');
+  assert.match(js, /get\('q'\)/, 'reads q');
+  assert.match(js, /requestSubmit/, 'runs the check through the form, so the same handler and counter run');
+  assert.match(js, /\['jbjs', 'ortho', 'all'\]/, 'scope only from the fixed list');
+  assert.match(js, /\^\\d\{4\}\$/, 'since only as a four-digit year');
+  assert.ok(!/answer/.test(js), 'never reads or writes the pasted answer');
+  assert.ok(!/history\.(push|replace)State/.test(js), 'never rewrites the address on its own');
+  assert.match(js, /slice\(0, 300\)/, 'topic capped at the field length');
+});
