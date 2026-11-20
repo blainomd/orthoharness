@@ -4,7 +4,7 @@
 // needs no hash. Two pages are served (2026-11-20, own two feet): the door (index.html) and the check (check.html).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 
 const host = JSON.parse(readFileSync(new URL('../firebase.hosting.json', import.meta.url)));
@@ -81,7 +81,13 @@ test('the check counts its job: start on submit, result when the answer shows, n
   assert.match(js, /data-step/, 'next from the data-step link');
   assert.ok(!/\.value|textContent|innerText|FormData/.test(js), 'never reads what was typed or shown');
   assert.match(js, /doNotTrack|globalPrivacyControl/, 'honours DNT and GPC');
-  assert.ok(/connect-src[^;]*https:\/\/solvinghealth\.com/.test(csp), 'the counter host is allowed');
+  // Own-host counting (2026-11-20): a step is a GET for an empty file on this site; nothing goes to another host.
+  assert.match(js, /fetch\("\/s\/" \+ s \+ "\.txt"/, 'a step asks this site for /s/<step>.txt');
+  assert.ok(!/sendBeacon|https?:\/\/|body:|JSON\.stringify/.test(js.replace(/\/\/[^\n]*/g, '')), 'no beacon, no other host, no body');
+  assert.match(js, /credentials: "omit"/, 'no cookie');
+  for (const k of ['start', 'result', 'next']) assert.ok(existsSync(new URL(`../site/s/${k}.txt`, import.meta.url)), `site/s/${k}.txt exists`);
+  for (const pg of pages) assert.ok(!/api\/arrive|estate-steps v1/.test(pg), 'no page names the shared counter');
+  assert.ok(!/connect-src[^;]*solvinghealth\.com/.test(csp), 'connect-src no longer allows the shared counter host');
   // One check, one start: the home button only opens /check, so the home counts next and partner clicks, not start.
   assert.ok(!/s==="start"/.test(pages[0]), 'home does not count start');
 });

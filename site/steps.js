@@ -1,15 +1,13 @@
-// estate steps for /check (2026-11-20): counts that the job was started, finished and followed, nothing else.
-// Sends the step, this page's path, a mobile flag and the referring host on the view. Never what was typed or shown.
-// Do Not Track, Global Privacy Control and bots: nothing is sent.
+// estate steps for /check (own-host since 2026-11-20): counts that the job was started, finished and followed, nothing else.
+// A step is a GET for an empty file on this same site (/s/start.txt, /s/result.txt, /s/next.txt), once each per page load:
+// no query, no body, no cookie, no other host. Visits are this host's own request log. Never what was typed or shown.
+// Do Not Track, Global Privacy Control and automated browsers: nothing is sent.
 (function () {
   try {
     var n = navigator;
     if (n.doNotTrack === "1" || n.globalPrivacyControl || n.webdriver || /bot|headless|lighthouse/i.test(n.userAgent)) return;
-    var u = "https://solvinghealth.com/api/arrive", m = matchMedia("(max-width:700px)").matches ? 1 : 0, sent = {};
-    var send = function (o) { try { o.p = location.pathname; o.m = m; n.sendBeacon(u, JSON.stringify(o)); } catch (e) {} };
-    var step = function (s) { if (sent[s]) return; sent[s] = 1; send({ s: s }); };
-    var r = ""; try { r = document.referrer ? new URL(document.referrer).hostname : ""; } catch (e) {}
-    send({ r: r });
+    var sent = {};
+    var step = function (s) { if (sent[s]) return; sent[s] = 1; try { fetch("/s/" + s + ".txt", { cache: "no-store", keepalive: true, credentials: "omit" }).catch(function () {}); } catch (e) {} };
     var f = document.getElementById('f');
     if (f) f.addEventListener('submit', function () { step("start"); }, true);
     var out = document.getElementById('out');
